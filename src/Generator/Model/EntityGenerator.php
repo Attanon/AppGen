@@ -36,16 +36,17 @@ class EntityGenerator
 			->addComment('@ORM\Table(name="' . strtolower($entityName) . '")');
 
 		$id = $class->addProperty('id');
-		$id->setType($this->config->entityIdType === 'uuid' || $this->config->entityIdType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
+		$id->setType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
 			->setVisibility('private')
 			->addComment('@ORM\Id')
-			->addComment('@ORM\Column(type="' . $this->config->entityIdType . '", unique=true)');
+			->addComment('@ORM\Column(type="' . $this->config->entity->idType . '", unique=true)');
 
-		if ($this->config->entityIdType === 'integer') {
+		if ($this->config->entity->idType === 'integer') {
 			$id->addComment('@ORM\GeneratedValue(strategy="IDENTITY")');
 		}
 
 		//TODO: Add properties (string, boolean, integer, array,
+		//TODO: Add default traits
 
 		/*$class->addProperty('test')
 			->setType('int')
@@ -61,8 +62,10 @@ class EntityGenerator
 		$constructor->addParameter('data')
 			->setType($namespace->getName() . '\\' . $entityName . 'Data');
 
+		$constructor->addBody('$this->id = $id');
+
 		$class->addMethod('getId')
-			->setReturnType($this->config->entityIdType === 'uuid' || $this->config->entityIdType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
+			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
 			->setBody('return $this->id;');
 
 		$namespace->add($class);

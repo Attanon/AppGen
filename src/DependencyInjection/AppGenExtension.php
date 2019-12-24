@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\DependencyInjection;
 
+use Archette\AppGen\Command\CreateModelCommand;
 use Archette\AppGen\Config\AppGenConfig;
+use Archette\AppGen\Generator\Model\EntityDataGenerator;
+use Archette\AppGen\Generator\Model\EntityFacadeGenerator;
+use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
+use Archette\AppGen\Generator\Model\EntityGenerator;
+use Archette\AppGen\Generator\Model\EntityRepositoryGenerator;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
@@ -18,18 +24,27 @@ class AppGenExtension extends CompilerExtension
 
 	public function getConfigSchema(): Schema
 	{
-		return Expect::structure([
-			'entity' => Expect::structure([
-				'idType' => Expect::string(),
-				'idComment' => Expect::string()->nullable(),
-				'useDataClass' => Expect::bool()->default(true),
-				'createSetters' => Expect::bool()->default(false),
-			])
-		]);
+		return Expect::from($this->config);
 	}
 
 	public function loadConfiguration(): void
 	{
-		//TODO: Register classes to DI
+		$this->getContainerBuilder()->addDefinition($this->prefix('createModelCommand'))
+			->setFactory(CreateModelCommand::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityGenerator'))
+			->setFactory(EntityGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityDataGenerator'))
+			->setFactory(EntityDataGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityFactoryGenerator'))
+			->setFactory(EntityFactoryGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityRepositoryGenerator'))
+			->setFactory(EntityRepositoryGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityFacadeGenerator'))
+			->setFactory(EntityFacadeGenerator::class, [$this->config]);
 	}
 }
