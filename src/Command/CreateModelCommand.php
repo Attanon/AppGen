@@ -16,7 +16,6 @@ class CreateModelCommand extends Command
 {
 	private AppGenConfig $config;
 	private EntityGenerator $entityGenerator;
-	protected static string $defaultName = 'appgen:model';
 
 	public function __construct(
 		AppGenConfig $config,
@@ -29,7 +28,7 @@ class CreateModelCommand extends Command
 
 	protected function configure(): void
 	{
-		$this->setName(self::$defaultName)
+		$this->setName('appgen:model')
 			->setDescription('Create model package with entity');
 	}
 
