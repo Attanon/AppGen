@@ -8,7 +8,7 @@ use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
 
-class EntityFactoryGenerator
+class EntityNotFoundExceptionGenerator
 {
 	private AppGenConfig $config;
 
@@ -24,9 +24,11 @@ class EntityFactoryGenerator
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString);
+		$namespace = $file->addNamespace($namespaceString . '\\Exception');
+		$namespace->addUse('Exception');
 
-		$class = new ClassType($entityName . 'Factory');
+		$class = new ClassType($entityName . 'NotFoundException');
+		$class->addExtend('Exception');
 
 		$namespace->add($class);
 

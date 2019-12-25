@@ -10,6 +10,7 @@ use Archette\AppGen\Generator\Model\EntityDataGenerator;
 use Archette\AppGen\Generator\Model\EntityFacadeGenerator;
 use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
 use Archette\AppGen\Generator\Model\EntityGenerator;
+use Archette\AppGen\Generator\Model\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\Model\EntityRepositoryGenerator;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
@@ -46,5 +47,8 @@ class AppGenExtension extends CompilerExtension
 
 		$this->getContainerBuilder()->addDefinition($this->prefix('entityFacadeGenerator'))
 			->setFactory(EntityFacadeGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityNotFoundExceptionGenerator'))
+			->setFactory(EntityNotFoundExceptionGenerator::class, [$this->config]);
 	}
 }

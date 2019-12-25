@@ -18,7 +18,7 @@ class EntityFacadeGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName, array $properties): string
+	public function create(string $namespaceString, string $entityName): string
 	{
 		$file = new PhpFile();
 
