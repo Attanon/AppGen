@@ -32,7 +32,9 @@ class EntityRepositoryGenerator
 		$namespace->addUse('Doctrine\ORM\EntityManagerInterface');
 		$namespace->addUse('Doctrine\ORM\EntityRepository');
 		$namespace->addUse('Doctrine\ORM\QueryBuilder');
-		$namespace->addUse('Ramsey\Uuid\UuidInterface');
+		if (Strings::contains($this->config->entity->idType, 'uuid')) {
+			$namespace->addUse('Ramsey\Uuid\UuidInterface');
+		}
 		$namespace->addUse($namespaceString . '\Exception\\' . $entityName . 'NotFoundException');
 
 		$class = new ClassType($entityName . 'Repository');
@@ -54,7 +56,7 @@ class EntityRepositoryGenerator
 
 		$get = $class->addMethod('get');
 		$get->addParameter('id')
-			->setType('Ramsey\Uuid\UuidInterface');
+			->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
 		$get->setReturnType($namespaceString . '\\' . $entityName);
 		$get->setVisibility('public')
 			->addComment('@throws ' . $entityName . 'NotFoundException');
@@ -66,7 +68,7 @@ class EntityRepositoryGenerator
 		foreach ($getByMethods as $fieldName => $fieldType) {
 			$method = $class->addMethod('getBy' . Strings::firstUpper($fieldName));
 			$method->addParameter($fieldName)
-				->setType($fieldType === 'uuid' ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
+				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
 			$method->setReturnType($namespaceString . '\\' . $entityName);
 			$method->setVisibility('public')
 				->addComment('@throws ' . $entityName . 'NotFoundException');
