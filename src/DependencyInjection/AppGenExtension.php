@@ -7,6 +7,7 @@ namespace Archette\AppGen\DependencyInjection;
 use Archette\AppGen\Command\CreateModelCommand;
 use Archette\AppGen\Config\AppGenConfig;
 use Archette\AppGen\Generator\Model\EntityDataGenerator;
+use Archette\AppGen\Generator\Model\EntityEventGenerator;
 use Archette\AppGen\Generator\Model\EntityFacadeGenerator;
 use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
 use Archette\AppGen\Generator\Model\EntityGenerator;
@@ -50,5 +51,8 @@ class AppGenExtension extends CompilerExtension
 
 		$this->getContainerBuilder()->addDefinition($this->prefix('entityNotFoundExceptionGenerator'))
 			->setFactory(EntityNotFoundExceptionGenerator::class, [$this->config]);
+
+		$this->getContainerBuilder()->addDefinition($this->prefix('entityEventGenerator'))
+			->setFactory(EntityEventGenerator::class, [$this->config]);
 	}
 }
