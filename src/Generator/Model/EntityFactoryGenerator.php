@@ -7,6 +7,7 @@ namespace Archette\AppGen\Generator\Model;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\Utils\Strings;
 
 class EntityFactoryGenerator
 {
@@ -25,8 +26,15 @@ class EntityFactoryGenerator
 		$file->setStrictTypes();
 
 		$namespace = $file->addNamespace($namespaceString);
+		if (Strings::contains($this->config->entity->idType, 'uuid')) {
+			$namespace->addUse('Ramsey\Uuid\UuidInterface');
+		}
 
-		$class = new ClassType($entityName . 'Factory');
+		$class = new ClassType(sprintf('%sFactory', $entityName));
+		$create = $class->addMethod('create')->setReturnType($namespaceString . '\\' . $entityName);
+		$create->addParameter('data')
+			->setType(sprintf('%sData', $namespaceString . '\\' . $entityName));
+		$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $entityName));
 
 		$namespace->add($class);
 
