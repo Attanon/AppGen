@@ -36,7 +36,11 @@ class EntityEventGenerator
 		$constructor = $class->addMethod('__construct');
 		$constructor->addParameter(Strings::firstLower($entityName))
 			->setType($namespaceString . '\\' . $entityName);
-		$constructor->addBody(sprintf('$this->%s = $%s;', $entityName, $entityName));
+		$constructor->addBody(sprintf('$this->%s = $%s;', Strings::firstLower($entityName), Strings::firstLower($entityName)));
+
+		$get = $class->addMethod(sprintf('get%s', $entityName))
+			->setReturnType($namespaceString . '\\' . $entityName);
+		$get->addBody(sprintf('return $this->%s;', Strings::firstLower($entityName)));
 
 		$namespace->add($class);
 
