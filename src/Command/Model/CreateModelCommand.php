@@ -12,6 +12,7 @@ use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
 use Archette\AppGen\Generator\Model\EntityGenerator;
 use Archette\AppGen\Generator\Model\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\Model\EntityRepositoryGenerator;
+use Generator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,7 +67,7 @@ class CreateModelCommand extends Command
 
 		$input = new CreateModelInput($namespace, $entityName, false);
 
-		$fileFromNamespace = function (string $namespace): string {
+		$filePath = function (string $namespace): string {
 			$directory = str_replace('\\', '/', $namespace);
 			$directory = ltrim($directory, explode('/', $directory)[0]);
 			$directory = substr($directory, strlen(explode('/', $directory)[0]));
@@ -79,19 +80,18 @@ class CreateModelCommand extends Command
 			return $directory;
 		};
 
-		$eventClassMap = [];
-		foreach ($input->getEvents() as $event) {
-			$eventClassMap[$fileFromNamespace($input->getEventClass($event, true))] = $this->entityEventGenerator->create($input, $event);
-		}
-
 		$classMap = [
-			$fileFromNamespace($input->getEntityClass(true)) => $this->entityGenerator->create($input),
-			$fileFromNamespace($input->getDataClass(true)) => $this->entityDataGenerator->create($input),
-			$fileFromNamespace($input->getFactoryClass(true)) => $this->entityFactoryGenerator->create($input),
-			$fileFromNamespace($input->getRepositoryClass(true)) => $this->entityRepositoryGenerator->create($input),
-			$fileFromNamespace($input->getFacadeClass(true)) => $this->entityFacadeGenerator->create($input),
-			$fileFromNamespace($input->getNotFoundExceptionClass(true)) => $this->entityNotFoundExceptionGenerator->create($input),
-			... $eventClassMap
+			$filePath($input->getEntityClass(true)) => $this->entityGenerator->create($input),
+			$filePath($input->getDataClass(true)) => $this->entityDataGenerator->create($input),
+			$filePath($input->getFactoryClass(true)) => $this->entityFactoryGenerator->create($input),
+			$filePath($input->getRepositoryClass(true)) => $this->entityRepositoryGenerator->create($input),
+			$filePath($input->getFacadeClass(true)) => $this->entityFacadeGenerator->create($input),
+			$filePath($input->getNotFoundExceptionClass(true)) => $this->entityNotFoundExceptionGenerator->create($input),
+			... (function () use ($input, $filePath): Generator {
+				foreach ($input->getEvents() as $event) {
+					yield $filePath($input->getEventClass($event, true)) => $this->entityEventGenerator->create($input, $event);
+				}
+			})()
 		];
 
 		$classMap = array_map(fn($content) => preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", $content), $classMap);
