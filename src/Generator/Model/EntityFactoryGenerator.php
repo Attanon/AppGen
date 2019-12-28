@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Model;
 
+use Archette\AppGen\Command\Model\CreateModelInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -19,25 +20,25 @@ class EntityFactoryGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName): string
+	public function create(CreateModelInput $input): string
 	{
 		$file = new PhpFile();
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString);
+		$namespace = $file->addNamespace($input->getNamespace());
 		if (Strings::contains($this->config->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
 
-		$class = new ClassType(sprintf('%sFactory', $entityName));
-		$create = $class->addMethod('create')->setReturnType($namespaceString . '\\' . $entityName);
+		$class = new ClassType($input->getFactoryClass());
+		$create = $class->addMethod('create')->setReturnType($input->getFactoryClass(true));
 		$create->addParameter('data')
-			->setType(sprintf('%sData', $namespaceString . '\\' . $entityName));
-		$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $entityName));
+			->setType($input->getFactoryClass(true));
+		$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $input->getEntityClass()));
 
 		$namespace->add($class);
 
-		return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", (string) $file);
+		return (string) $file;
 	}
 }

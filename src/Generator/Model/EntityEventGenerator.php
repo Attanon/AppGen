@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Model;
 
+use Archette\AppGen\Command\Model\CreateModelInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -19,31 +20,31 @@ class EntityEventGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName, string $eventName): string
+	public function create(CreateModelInput $input, string $eventName): string
 	{
 		$file = new PhpFile();
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString . '\\Event');
-		$namespace->addUse($namespaceString . '\\' . $entityName);
+		$namespace = $file->addNamespace($input->getEventNamespace());
+		$namespace->addUse($input->getEntityClass(true));
 
-		$class = new ClassType(sprintf('%s%sEvent', $entityName, Strings::firstUpper($eventName)));
+		$class = new ClassType($input->getEventClass($eventName));
 
-		$class->addProperty(Strings::firstLower($entityName))
-			->setType($namespaceString . '\\' . $entityName);
+		$class->addProperty(Strings::firstLower($input->getEntityClass()))
+			->setType($input->getEntityClass(true));
 
 		$constructor = $class->addMethod('__construct');
-		$constructor->addParameter(Strings::firstLower($entityName))
-			->setType($namespaceString . '\\' . $entityName);
-		$constructor->addBody(sprintf('$this->%s = $%s;', Strings::firstLower($entityName), Strings::firstLower($entityName)));
+		$constructor->addParameter(Strings::firstLower($input->getEntityClass()))
+			->setType($input->getEntityClass(true));
+		$constructor->addBody(sprintf('$this->%1$s = $%1$s;', Strings::firstLower($input->getEntityClass())));
 
-		$get = $class->addMethod(sprintf('get%s', $entityName))
-			->setReturnType($namespaceString . '\\' . $entityName);
-		$get->addBody(sprintf('return $this->%s;', Strings::firstLower($entityName)));
+		$get = $class->addMethod(sprintf('get%s', $input->getEntityClass()))
+			->setReturnType($input->getEntityClass(true));
+		$get->addBody(sprintf('return $this->%s;', Strings::firstLower($input->getEntityClass())));
 
 		$namespace->add($class);
 
-		return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", (string) $file);
+		return (string) $file;
 	}
 }

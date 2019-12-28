@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\DependencyInjection;
 
-use Archette\AppGen\Command\CreateModelCommand;
+use Archette\AppGen\Command\Model\CreateModelCommand;
 use Archette\AppGen\Config\AppGenConfig;
 use Archette\AppGen\Generator\Model\EntityDataGenerator;
 use Archette\AppGen\Generator\Model\EntityEventGenerator;

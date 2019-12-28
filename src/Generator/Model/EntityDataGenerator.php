@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Model;
 
+use Archette\AppGen\Command\Model\CreateModelInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -18,18 +19,18 @@ class EntityDataGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName, array $properties): string
+	public function create(CreateModelInput $input): string
 	{
 		$file = new PhpFile();
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString);
+		$namespace = $file->addNamespace($input->getNamespace());
 
-		$class = new ClassType($entityName . 'Data');
+		$class = new ClassType($input->getDataClass());
 
 		$namespace->add($class);
 
-		return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", (string) $file);
+		return (string) $file;
 	}
 }

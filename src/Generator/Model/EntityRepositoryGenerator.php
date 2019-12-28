@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Model;
 
+use Archette\AppGen\Command\Model\CreateModelInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -19,14 +20,14 @@ class EntityRepositoryGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName, bool $createGetAllMethod, array $getByMethods = [], array $getAllByMethods = []): string
+	public function create(CreateModelInput $input): string
 	{
 		$file = new PhpFile();
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString);
-		if (in_array('DateTime', array_merge(array_values($getByMethods), array_values($getAllByMethods)))) {
+		$namespace = $file->addNamespace($input->getNamespace());
+		if (in_array('DateTime', array_merge(array_values($input->getGetByMethods()), array_values($input->getGetAllByMethods())))) {
 			$namespace->addUse('DateTime');
 		}
 		$namespace->addUse('Doctrine\ORM\EntityManagerInterface');
@@ -35,9 +36,9 @@ class EntityRepositoryGenerator
 		if (Strings::contains($this->config->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
-		$namespace->addUse($namespaceString . '\Exception\\' . $entityName . 'NotFoundException');
+		$namespace->addUse($input->getNotFoundExceptionClass(true));
 
-		$class = new ClassType($entityName . 'Repository');
+		$class = new ClassType($input->getRepositoryClass());
 		$class->setAbstract();
 
 		$class->addProperty('entityManager')
@@ -52,48 +53,48 @@ class EntityRepositoryGenerator
 		$class->addMethod('getRepository')
 			->setVisibility('private')
 			->addComment('@return EntityRepository|ObjectRepository')
-			->addBody('return $this->entityManager->getRepository(' . $entityName . '::class);');
+			->addBody('return $this->entityManager->getRepository(' . $input->getEntityClass() . '::class);');
 
 		$get = $class->addMethod('get');
 		$get->addParameter('id')
 			->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
-		$get->setReturnType($namespaceString . '\\' . $entityName);
+		$get->setReturnType($input->getEntityClass(true));
 		$get->setVisibility('public')
-			->addComment('@throws ' . $entityName . 'NotFoundException');
+			->addComment('@throws ' . $input->getNotFoundExceptionClass());
 
-		foreach ($this->createGetByBody($entityName, 'id') as $code) {
+		foreach ($this->createGetByBody($input->getEntityClass(), 'id') as $code) {
 			$get->addBody($code);
 		}
 
-		foreach ($getByMethods as $fieldName => $fieldType) {
+		foreach ($input->getGetByMethods() as $fieldName => $fieldType) {
 			$method = $class->addMethod('getBy' . Strings::firstUpper($fieldName));
 			$method->addParameter($fieldName)
 				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
-			$method->setReturnType($namespaceString . '\\' . $entityName);
+			$method->setReturnType($input->getEntityClass(true));
 			$method->setVisibility('public')
-				->addComment('@throws ' . $entityName . 'NotFoundException');
-			foreach ($this->createGetByBody($entityName, $fieldName) as $code) {
+				->addComment('@throws ' . $input->getNotFoundExceptionClass());
+			foreach ($this->createGetByBody($input->getEntityClass(), $fieldName) as $code) {
 				$method->addBody($code);
 			}
 		}
 
-		foreach ($getAllByMethods as $fieldName => $fieldType) {
+		foreach ($input->getGetAllByMethods() as $fieldName => $fieldType) {
 			$method = $class->addMethod('getAllBy' . Strings::firstUpper($fieldName));
 			$method->addParameter($fieldName)
 				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
 			$method->setReturnType('array');
 			$method->setVisibility('public')
-				->addComment('@return ' . $entityName . '[]');
-			foreach ($this->createGetAllByBody($entityName, $fieldName) as $code) {
+				->addComment('@return ' . $input->getEntityClass() . '[]');
+			foreach ($this->createGetAllByBody($input->getEntityClass(), $fieldName) as $code) {
 				$method->addBody($code);
 			}
 		}
 
-		if ($createGetAllMethod) {
+		if ($input->isCreateGetAllMethod()) {
 			$class->addMethod('getAll')
 				->setReturnType('array')
 				->setVisibility('public')
-				->addComment('@return ' . $entityName . '[]')
+				->addComment('@return ' . $input->getEntityClass() . '[]')
 				->addBody('return $this->getQueryBuilderForAll()->getQuery()->execute();');
 		}
 
@@ -104,7 +105,7 @@ class EntityRepositoryGenerator
 
 		$namespace->add($class);
 
-		return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", (string) $file);
+		return (string) $file;
 	}
 
 	private function createGetByBody(string $entityName, string $fieldName): array

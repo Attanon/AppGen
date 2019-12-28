@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Model;
 
+use Archette\AppGen\Command\Model\CreateModelInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\Utils\Strings;
 
 class EntityGenerator
 {
@@ -18,22 +20,22 @@ class EntityGenerator
 		$this->config = $config;
 	}
 
-	public function create(string $namespaceString, string $entityName, array $properties): string
+	public function create(CreateModelInput $input): string
 	{
 		$file = new PhpFile();
 
 		$file->setStrictTypes();
 
-		$namespace = $file->addNamespace($namespaceString);
+		$namespace = $file->addNamespace($input->getNamespace());
 
 		$namespace->addUse('Doctrine\ORM\Mapping', 'ORM');
 		$namespace->addUse('Ramsey\Uuid\UuidInterface');
 
-		$class = new ClassType($entityName);
+		$class = new ClassType($input->getEntityClass());
 
 		$class->addComment('@ORM\Entity')
 			->addComment('@ORM\HasLifecycleCallbacks')
-			->addComment('@ORM\Table(name="' . strtolower($entityName) . '")');
+			->addComment('@ORM\Table(name="' . str_replace('-', '_', Strings::webalize($input->getEntityClass())) . '")');
 
 		$id = $class->addProperty('id');
 		$id->setType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
@@ -60,7 +62,7 @@ class EntityGenerator
 			->setType('Ramsey\Uuid\UuidInterface');
 
 		$constructor->addParameter('data')
-			->setType($namespace->getName() . '\\' . $entityName . 'Data');
+			->setType($input->getDataClass(true));
 
 		$constructor->addBody('$this->id = $id');
 
@@ -70,6 +72,6 @@ class EntityGenerator
 
 		$namespace->add($class);
 
-		return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", (string) $file);
+		return (string) $file;
 	}
 }
