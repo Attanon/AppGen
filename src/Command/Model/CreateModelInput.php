@@ -73,12 +73,12 @@ class CreateModelInput
 
 	public function getNotFoundExceptionClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->getExceptionNamespace() . $this->entityClass : $this->entityClass) . 'NotFoundException';
+		return ($withNamespace ? $this->getExceptionNamespace() . '\\' . $this->entityClass : $this->entityClass) . 'NotFoundException';
 	}
 
 	public function getEventClass(string $eventName, bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->getEventNamespace() . $this->entityClass : $this->entityClass) . Strings::firstUpper($eventName) . 'Event';
+		return ($withNamespace ? $this->getEventNamespace() . '\\' . $this->entityClass : $this->entityClass) . Strings::firstUpper($eventName) . 'Event';
 	}
 
 	public function isCreateGetAllMethod(): bool

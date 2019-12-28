@@ -115,9 +115,10 @@ class EntityRepositoryGenerator
 		$code[] = '/** @var ' . $entityName . ' $' . Strings::firstLower($entityName) . ' */';
 		$code[] = '$' . Strings::firstLower($entityName) . ' = $this->getRepository()->findOneBy([';
 		$code[] = '	\'' . $fieldName . '\' => $' . $fieldName;
+		$code[] = ']);';
 		$code[] = '';
 		$code[] = 'if ($' . Strings::firstLower($entityName) . ' === null) {';
-		$code[] = '	throw new ' . $entityName . 'NotFoundException(\'' . $entityName . ' with ' . $fieldName . ' "\' . $' . Strings::firstLower($fieldName) . ' . \'" not found.\');';
+		$code[] = '	throw new ' . $entityName . 'NotFoundException(\'sprintf(' . $entityName . ' with ' . $fieldName . ' "%s" not found.\', $' . Strings::firstLower($fieldName) . '));';
 		$code[] = '}';
 		$code[] = '';
 		$code[] = 'return $' . Strings::firstLower($entityName) . ';';

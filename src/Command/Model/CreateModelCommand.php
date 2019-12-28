@@ -68,31 +68,30 @@ class CreateModelCommand extends Command
 		$input = new CreateModelInput($namespace, $entityName, false);
 
 		$filePath = function (string $namespace): string {
-			$directory = str_replace('\\', '/', $namespace);
-			$directory = ltrim($directory, explode('/', $directory)[0]);
-			$directory = substr($directory, strlen(explode('/', $directory)[0]));
-			$directory = $this->config->appDir . $directory . '.php';
+			$path = str_replace('\\', '/', $namespace);
+			$path = substr($path, strlen(explode('/', $path)[0]));
+			$path = $this->config->appDir . $path . '.php';
 
-			if (!file_exists($directory)) {
+			if (!file_exists($directory = dirname($path))) {
 				mkdir($directory, 0777, true);
 			}
 
-			return $directory;
+			return $path;
 		};
 
-		$classMap = [
+		$eventMap = [];
+		foreach ($input->getEvents() as $event) {
+			$eventMap[$filePath($input->getEventClass($event, true))] = $this->entityEventGenerator->create($input, $event);
+		}
+
+		$classMap = array_merge([
 			$filePath($input->getEntityClass(true)) => $this->entityGenerator->create($input),
 			$filePath($input->getDataClass(true)) => $this->entityDataGenerator->create($input),
 			$filePath($input->getFactoryClass(true)) => $this->entityFactoryGenerator->create($input),
 			$filePath($input->getRepositoryClass(true)) => $this->entityRepositoryGenerator->create($input),
 			$filePath($input->getFacadeClass(true)) => $this->entityFacadeGenerator->create($input),
-			$filePath($input->getNotFoundExceptionClass(true)) => $this->entityNotFoundExceptionGenerator->create($input),
-			... (function () use ($input, $filePath): Generator {
-				foreach ($input->getEvents() as $event) {
-					yield $filePath($input->getEventClass($event, true)) => $this->entityEventGenerator->create($input, $event);
-				}
-			})()
-		];
+			$filePath($input->getNotFoundExceptionClass(true)) => $this->entityNotFoundExceptionGenerator->create($input)
+		], $eventMap);
 
 		$classMap = array_map(fn($content) => preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", $content), $classMap);
 
