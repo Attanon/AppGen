@@ -12,7 +12,6 @@ use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
 use Archette\AppGen\Generator\Model\EntityGenerator;
 use Archette\AppGen\Generator\Model\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\Model\EntityRepositoryGenerator;
-use Generator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
