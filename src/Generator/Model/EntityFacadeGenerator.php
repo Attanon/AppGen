@@ -28,6 +28,7 @@ class EntityFacadeGenerator
 		$namespace = $file->addNamespace($input->getNamespace());
 
 		$class = new ClassType($input->getFacadeClass());
+		$class->setFinal();
 
 		$namespace->add($class);
 

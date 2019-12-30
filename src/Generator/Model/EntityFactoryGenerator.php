@@ -32,6 +32,7 @@ class EntityFactoryGenerator
 		}
 
 		$class = new ClassType($input->getFactoryClass());
+		$class->setFinal();
 		$create = $class->addMethod('create')->setReturnType($input->getFactoryClass(true));
 		$create->addParameter('data')
 			->setType($input->getFactoryClass(true));

@@ -29,6 +29,7 @@ class EntityNotFoundExceptionGenerator
 		$namespace->addUse('Exception');
 
 		$class = new ClassType($input->getNotFoundExceptionClass());
+		$class->setFinal();
 		$class->addExtend('Exception');
 
 		$namespace->add($class);
