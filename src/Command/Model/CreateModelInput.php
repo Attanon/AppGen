@@ -11,6 +11,8 @@ class CreateModelInput
 	private string $namespace;
 	private string $entityClass;
 	private bool $createGetAllMethod;
+	private bool $createDeleteMethod;
+	private bool $createSoftDeleteMethod;
 	private array $getByMethods;
 	private array $getAllByMethods;
 	private array $events;
@@ -19,6 +21,8 @@ class CreateModelInput
 		string $namespace,
 		string $entity,
 		bool $createGetAllMethod,
+		bool $createDeleteMethod,
+		bool $createSoftDeleteMethod,
 		array $getByMethods = [],
 		array $getAllByMethods = [],
 		array $events = []
@@ -26,6 +30,8 @@ class CreateModelInput
 		$this->namespace = $namespace;
 		$this->entityClass = $entity;
 		$this->createGetAllMethod = $createGetAllMethod;
+		$this->createDeleteMethod = $createDeleteMethod;
+		$this->createSoftDeleteMethod = $createSoftDeleteMethod;
 		$this->getByMethods = $getByMethods;
 		$this->getAllByMethods = $getAllByMethods;
 		$this->events = $events;
@@ -76,9 +82,9 @@ class CreateModelInput
 		return ($withNamespace ? $this->getExceptionNamespace() . '\\' . $this->entityClass : $this->entityClass) . 'NotFoundException';
 	}
 
-	public function getEventClass(string $eventName, bool $withNamespace = false): string
+	public function getEventClass(string $eventName, bool $withNamespace = false): ?string
 	{
-		return ($withNamespace ? $this->getEventNamespace() . '\\' . $this->entityClass : $this->entityClass) . Strings::firstUpper($eventName) . 'Event';
+		return in_array($eventName, $this->events) ? (($withNamespace ? $this->getEventNamespace() . '\\' . $this->entityClass : $this->entityClass) . Strings::firstUpper($eventName) . 'Event') : null;
 	}
 
 	public function isCreateGetAllMethod(): bool
@@ -99,5 +105,10 @@ class CreateModelInput
 	public function getEvents(): array
 	{
 		return $this->events;
+	}
+
+	public function hasEvents(): bool
+	{
+		return !empty($this->events);
 	}
 }
