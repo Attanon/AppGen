@@ -29,7 +29,9 @@ class EntityFacadeGenerator
 		$namespace = $file->addNamespace($input->getNamespace());
 		$namespace->addUse($input->getFactoryClass(true));
 		$namespace->addUse('\Doctrine\ORM\EntityManagerInterface');
-		$namespace->addUse('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        if ($input->hasEvents()) {
+            $namespace->addUse('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        }
 
 		$class = new ClassType($input->getFacadeClass());
 		$class->setFinal();
