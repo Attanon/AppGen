@@ -32,6 +32,9 @@ class EntityFacadeGenerator
         if ($input->hasEvents()) {
             $namespace->addUse('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
         }
+        if (Strings::contains($this->config->entity->idType, 'uuid')) {
+            $namespace->addUse('Ramsey\Uuid\UuidInterface');
+        }
 
 		$class = new ClassType($input->getFacadeClass());
 		$class->setFinal();
@@ -69,7 +72,8 @@ class EntityFacadeGenerator
         }
 
         $create = $class->addMethod('create')
-            ->setReturnType($input->getEntityClass(true));
+            ->setReturnType($input->getEntityClass(true))
+            ->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
         $create->addParameter('data')
             ->setType($input->getDataClass(true));
@@ -84,6 +88,28 @@ class EntityFacadeGenerator
             $create->addBody('');
         }
         $create->addBody(sprintf('return $%s;', Strings::firstLower($input->getEntityClass())));
+
+        if ($input->createSoftDeleteMethod()) {
+            //TODO: Implement soft-delete and removable trait
+        }
+
+        if ($input->createDeleteMethod()) {
+            $delete = $class->addMethod('delete')
+                ->setReturnType('void')
+                ->setVisibility(ClassType::VISIBILITY_PUBLIC);
+
+            $delete->addParameter('id')
+                ->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
+
+            $delete->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
+            $delete->addBody('');
+            if (isset($eventDispatcherProperty) && $deletedEvent = $input->getEventClass('deleted')) {
+                $create->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $deletedEvent, Strings::firstLower($input->getEntityClass())));
+                $create->addBody('');
+            }
+            $delete->addBody(sprintf('$this->%s->remove($%s);', $entityManagerProperty->getName(), Strings::firstLower($input->getEntityClass())));
+            $delete->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
+        }
 
 		$namespace->add($class);
 

@@ -111,4 +111,14 @@ class CreateModelInput
 	{
 		return !empty($this->events);
 	}
+
+	public function createDeleteMethod(): bool
+    {
+        return $this->createDeleteMethod;
+    }
+
+	public function createSoftDeleteMethod(): bool
+    {
+        return $this->createSoftDeleteMethod;
+    }
 }
