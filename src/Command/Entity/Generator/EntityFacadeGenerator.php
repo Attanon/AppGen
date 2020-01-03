@@ -123,8 +123,8 @@ class EntityFacadeGenerator
 			$delete->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
 			$delete->addBody('');
 			if (isset($eventDispatcherProperty) && $deletedEvent = $input->getEventClass('deleted')) {
-				$create->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $deletedEvent, Strings::firstLower($input->getEntityClass())));
-				$create->addBody('');
+				$delete->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $deletedEvent, Strings::firstLower($input->getEntityClass())));
+				$delete->addBody('');
 			}
 			$delete->addBody(sprintf('$this->%s->remove($%s);', $entityManagerProperty->getName(), Strings::firstLower($input->getEntityClass())));
 			$delete->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
