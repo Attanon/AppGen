@@ -123,6 +123,16 @@ class EntityProperty
 		return $this->nullable;
 	}
 
+	public function isBoolean(): bool
+	{
+		return Strings::contains($this->type, 'bool');
+	}
+
+	public function isNumeric(): bool
+	{
+		return Strings::contains($this->type, 'int') || Strings::contains($this->type, 'float');
+	}
+
 	public function __toString()
 	{
 		return $this->getName();

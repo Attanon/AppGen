@@ -75,7 +75,10 @@ class CreateEntityCommand extends Command
 			true,
 			true,
 			true,
-			true
+			true,
+			['test1', 'test2'],
+			['test3'],
+			['created', 'deleted', 'updated']
 		);
 
 		$filePath = function (string $namespace): string {

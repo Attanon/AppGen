@@ -89,6 +89,13 @@ class EntityGenerator
 			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
 			->setBody('return $this->id;');
 
+		foreach ($input->getEntityProperties() as $property) {
+			$class->addMethod(($property->isBoolean() ? 'is' : 'get') . Strings::firstUpper($property->getName()))
+				->setReturnType($property->getType())
+				->setReturnNullable($property->isNullable())
+				->setBody(sprintf('return $%s;', $property->getName()));
+		}
+
 		$namespace->add($class);
 
 		return (string) $file;
