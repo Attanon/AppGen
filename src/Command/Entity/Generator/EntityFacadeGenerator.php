@@ -65,10 +65,10 @@ class EntityFacadeGenerator
 		}
 
 		$constructor->addBody(sprintf('parent::__construct($%s);', $entityManagerProperty->getName()));
-		$constructor->addBody(sprintf('$this->%1$s = $%1$s', $factoryProperty->getName()));
-		$constructor->addBody(sprintf('$this->%1$s = $%1$s', $entityManagerProperty->getName()));
+		$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $factoryProperty->getName()));
+		$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $entityManagerProperty->getName()));
 		if (isset($eventDispatcherProperty)) {
-			$constructor->addBody(sprintf('$this->%1$s = $%1$s', $eventDispatcherProperty->getName()));
+			$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $eventDispatcherProperty->getName()));
 		}
 
 		$create = $class->addMethod('create')
