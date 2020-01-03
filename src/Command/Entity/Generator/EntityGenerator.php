@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Generator\Model;
+namespace Archette\AppGen\Command\Entity\Generator;
 
-use Archette\AppGen\Command\Model\CreateModelInput;
+use Archette\AppGen\Command\Entity\CreateEntityInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -20,7 +20,7 @@ class EntityGenerator
 		$this->config = $config;
 	}
 
-	public function create(CreateModelInput $input): string
+	public function create(CreateEntityInput $input): string
 	{
 		$file = new PhpFile();
 
@@ -65,6 +65,16 @@ class EntityGenerator
 			->setType($input->getDataClass(true));
 
 		$constructor->addBody('$this->id = $id');
+
+		if ($input->createEditMethod()) {
+			$edit = $class->addMethod('edit')
+				->setReturnType('void');
+
+			$edit->addParameter('data')
+				->setType($input->getDataClass(true));
+
+
+		}
 
 		$class->addMethod('getId')
 			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')

@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Model;
+namespace Archette\AppGen\Command\Entity;
 
+use Archette\AppGen\Command\Entity\Generator\EntityDataGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityEventGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityFacadeGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityFactoryGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityNotFoundExceptionGenerator;
+use Archette\AppGen\Command\Entity\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
-use Archette\AppGen\Generator\Model\EntityDataGenerator;
-use Archette\AppGen\Generator\Model\EntityEventGenerator;
-use Archette\AppGen\Generator\Model\EntityFacadeGenerator;
-use Archette\AppGen\Generator\Model\EntityFactoryGenerator;
-use Archette\AppGen\Generator\Model\EntityGenerator;
-use Archette\AppGen\Generator\Model\EntityNotFoundExceptionGenerator;
-use Archette\AppGen\Generator\Model\EntityRepositoryGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class CreateModelCommand extends Command
+class CreateEntityCommand extends Command
 {
 	private AppGenConfig $config;
 	private EntityGenerator $entityGenerator;
@@ -52,7 +52,7 @@ class CreateModelCommand extends Command
 
 	protected function configure(): void
 	{
-		$this->setName('appgen:model')
+		$this->setName('appgen:entity')
 			->setDescription('Create model package with entity');
 	}
 
@@ -64,7 +64,7 @@ class CreateModelCommand extends Command
 		$namespace = trim($questionHelper->ask($input, $output, new Question('Namespace: ')), '\\');
 		$entityName = $questionHelper->ask($input, $output, new Question('Entity name: '));
 
-		$input = new CreateModelInput($namespace, $entityName, false);
+		$input = new CreateEntityInput($namespace, $entityName, false);
 
 		$filePath = function (string $namespace): string {
 			$path = str_replace('\\', '/', $namespace);

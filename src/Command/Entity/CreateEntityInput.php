@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Model;
+namespace Archette\AppGen\Command\Entity;
 
 use Nette\Utils\Strings;
 
-class CreateModelInput
+class CreateEntityInput
 {
 	private string $namespace;
 	private string $entityClass;
