@@ -18,9 +18,13 @@ class CreateEntityInput
 	private array $getAllByMethods;
 	private array $events;
 
+	/** @var EntityProperty[] */
+	private array $entityProperties;
+
 	public function __construct(
 		string $namespace,
 		string $entity,
+		array $entityProperties,
 		bool $createGetAllMethod,
 		bool $createEditMethod,
 		bool $createDeleteMethod,
@@ -31,6 +35,7 @@ class CreateEntityInput
 	) {
 		$this->namespace = $namespace;
 		$this->entityClass = $entity;
+		$this->entityProperties = $entityProperties;
 		$this->createGetAllMethod = $createGetAllMethod;
 		$this->createEditMethod = $createEditMethod;
 		$this->createDeleteMethod = $createDeleteMethod;
@@ -128,5 +133,11 @@ class CreateEntityInput
 	public function createSoftDeleteMethod(): bool
 	{
 		return $this->createSoftDeleteMethod;
+	}
+
+	/** @return EntityProperty[] */
+	public function getEntityProperties(): array
+	{
+		return $this->entityProperties;
 	}
 }

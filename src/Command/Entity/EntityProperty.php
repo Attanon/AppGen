@@ -11,14 +11,14 @@ class EntityProperty
 	private string $name;
 	private string $type;
 	private string $doctrineType;
-	private int $doctrineMaxLength;
-	private string $defaultValue;
-	private bool $nullable;
+	private ?int $doctrineMaxLength;
+	private ?string $defaultValue;
+	private ?bool $nullable;
 
 	public function __construct(
 		string $name,
 		string $type,
-		string $defaultValue,
+		string $defaultValue = null,
 		?bool $nullable = null,
 		?int $doctrineMaxLength = null
 	) {
@@ -37,7 +37,7 @@ class EntityProperty
 		}
 	}
 
-	private function isTypeNullable(string $type): ?bool
+	private function isTypeNullable(string $type): bool
 	{
 		return Strings::startsWith($type, '?');
 	}
@@ -105,13 +105,18 @@ class EntityProperty
 		return $this->doctrineMaxLength;
 	}
 
-	public function getDefaultValue(): string
+	public function getDefaultValue(): ?string
 	{
 		return $this->defaultValue;
 	}
 
-	public function isNullable(): ?bool
+	public function isNullable(): bool
 	{
 		return $this->nullable;
+	}
+
+	public function __toString()
+	{
+		return $this->getName();
 	}
 }

@@ -47,14 +47,19 @@ class EntityGenerator
 			$id->addComment('@ORM\GeneratedValue(strategy="IDENTITY")');
 		}
 
-		//TODO: Add properties (string, boolean, integer, array,
 		//TODO: Add default traits
 
-		/*$class->addProperty('test')
-			->setType('int')
-			->setNullable()
-			->setVisibility('private')
-			->addComment('@ORM\Column(type="integer")');*/
+		foreach ($input->getEntityProperties() as $property) {
+			$doctrineProperty = $class->addProperty($property->getName())
+				->setType($property->getType())
+				->setNullable($property->isNullable())
+				->setVisibility(ClassType::VISIBILITY_PRIVATE)
+				->addComment(sprintf('@ORM\Column(type="%s"%s)', $property->getDoctrineType(), $property->getDoctrineMaxLength() !== null ? ', length="' . $property->getDoctrineMaxLength() . '"' : ''));
+
+			if ($defaultValue = $property->getDefaultValue()) {
+				$doctrineProperty->setValue($defaultValue);
+			}
+		}
 
 		$constructor = $class->addMethod('__construct');
 
@@ -73,7 +78,11 @@ class EntityGenerator
 			$edit->addParameter('data')
 				->setType($input->getDataClass(true));
 
-
+			foreach ($input->getEntityProperties() as $property) {
+				if ($property->getName() !== 'updatedAt' && $property->getName() !== 'createdAt') {
+					$edit->addBody(sprintf('$this->%1$s = $data->%1$s', $property->getName()));
+				}
+			}
 		}
 
 		$class->addMethod('getId')
