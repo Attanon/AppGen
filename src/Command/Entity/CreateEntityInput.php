@@ -72,7 +72,7 @@ class CreateEntityInput
 
 	public function getFactoryClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Repository';
+		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Factory';
 	}
 
 	public function getRepositoryClass(bool $withNamespace = false): string
