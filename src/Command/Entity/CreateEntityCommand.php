@@ -64,7 +64,19 @@ class CreateEntityCommand extends Command
 		$namespace = trim($questionHelper->ask($input, $output, new Question('Namespace: ')), '\\');
 		$entityName = $questionHelper->ask($input, $output, new Question('Entity name: '));
 
-		$input = new CreateEntityInput($namespace, $entityName, false);
+		$input = new CreateEntityInput(
+			$namespace,
+			$entityName,
+			[
+				new EntityProperty('test1', 'int', '5', false, 15),
+				new EntityProperty('test2', 'string', null, true, 10),
+				new EntityProperty('test3', 'bool', 'false', false, 15)
+			],
+			true,
+			true,
+			true,
+			true
+		);
 
 		$filePath = function (string $namespace): string {
 			$path = str_replace('\\', '/', $namespace);

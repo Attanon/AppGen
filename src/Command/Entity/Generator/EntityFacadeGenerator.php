@@ -90,11 +90,26 @@ class EntityFacadeGenerator
 		$create->addBody(sprintf('return $%s;', Strings::firstLower($input->getEntityClass())));
 
 		if ($input->createEditMethod()) {
+			$edit = $class->addMethod('edit')
+				->setReturnType($input->getEntityClass(true))
+				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
+			$edit->addParameter('id')
+				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
+
+			$create->addParameter('data')
+				->setType($input->getDataClass(true));
+
+			$edit->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
+			$edit->addBody('');
+			$edit->addBody(sprintf('$%s->edit($data);', Strings::firstLower($input->getEntityClass())));
+			$edit->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
+			$edit->addBody('');
+			$edit->addBody(sprintf('return $%s;', Strings::firstLower($input->getEntityClass())));
 		}
 
 		if ($input->createSoftDeleteMethod()) {
-			//TODO: Implement soft-delete and removable trait
+			//TODO: Implement soft-delete trait
 		}
 
 		if ($input->createDeleteMethod()) {

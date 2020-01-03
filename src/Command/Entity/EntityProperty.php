@@ -105,8 +105,16 @@ class EntityProperty
 		return $this->doctrineMaxLength;
 	}
 
-	public function getDefaultValue(): ?string
+	public function getDefaultValue()
 	{
+		if ($this->type === 'int' || $this->type === 'float') {
+			return (int) $this->defaultValue;
+		}
+
+		if ($this->type === 'bool') {
+			return $this->defaultValue === 'true' || $this->defaultValue === '1';
+		}
+
 		return $this->defaultValue;
 	}
 
