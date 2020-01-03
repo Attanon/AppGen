@@ -29,6 +29,17 @@ class EntityDataGenerator
 
 		$class = new ClassType($input->getDataClass());
 
+		foreach ($input->getEntityProperties() as $property) {
+			$dataProperty = $class->addProperty($property->getName())
+				->setType($property->getType())
+				->setNullable($property->isNullable())
+				->setVisibility(ClassType::VISIBILITY_PUBLIC);
+
+			if ($defaultValue = $property->getDefaultValue()) {
+				$dataProperty->setValue($defaultValue);
+			}
+		}
+
 		$namespace->add($class);
 
 		return (string) $file;
