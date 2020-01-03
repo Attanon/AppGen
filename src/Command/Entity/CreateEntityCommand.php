@@ -76,8 +76,8 @@ class CreateEntityCommand extends Command
 			true,
 			true,
 			true,
-			['test1', 'test2'],
-			['test3'],
+			['test1' => 'string', 'test2' => 'string'],
+			['test3' => 'int'],
 			['created', 'deleted', 'updated']
 		);
 
