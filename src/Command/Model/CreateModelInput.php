@@ -11,6 +11,7 @@ class CreateModelInput
 	private string $namespace;
 	private string $entityClass;
 	private bool $createGetAllMethod;
+	private bool $createEditMethod;
 	private bool $createDeleteMethod;
 	private bool $createSoftDeleteMethod;
 	private array $getByMethods;
@@ -21,6 +22,7 @@ class CreateModelInput
 		string $namespace,
 		string $entity,
 		bool $createGetAllMethod,
+		bool $createEditMethod,
 		bool $createDeleteMethod,
 		bool $createSoftDeleteMethod,
 		array $getByMethods = [],
@@ -30,6 +32,7 @@ class CreateModelInput
 		$this->namespace = $namespace;
 		$this->entityClass = $entity;
 		$this->createGetAllMethod = $createGetAllMethod;
+		$this->createEditMethod = $createEditMethod;
 		$this->createDeleteMethod = $createDeleteMethod;
 		$this->createSoftDeleteMethod = $createSoftDeleteMethod;
 		$this->getByMethods = $getByMethods;
@@ -113,12 +116,17 @@ class CreateModelInput
 	}
 
 	public function createDeleteMethod(): bool
-    {
-        return $this->createDeleteMethod;
-    }
+	{
+		return $this->createDeleteMethod;
+	}
+
+	public function createEditMethod(): bool
+	{
+		return $this->createEditMethod;
+	}
 
 	public function createSoftDeleteMethod(): bool
-    {
-        return $this->createSoftDeleteMethod;
-    }
+	{
+		return $this->createSoftDeleteMethod;
+	}
 }
