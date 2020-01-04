@@ -38,6 +38,7 @@ class EntityFacadeGenerator
 
 		$class = new ClassType($input->getFacadeClass());
 		$class->setFinal();
+		$class->setExtends($input->getRepositoryClass(true));
 
 		$constructor = $class->addMethod('__construct');
 
