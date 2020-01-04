@@ -54,7 +54,12 @@ class EntityGenerator
 				->setType($property->getType())
 				->setNullable($property->isNullable())
 				->setVisibility(ClassType::VISIBILITY_PRIVATE)
-				->addComment(sprintf('@ORM\Column(type="%s"%s)', $property->getDoctrineType(), $property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : ''));
+				->addComment(sprintf('@ORM\Column(type="%s"%s%s%s)',
+					$property->getDoctrineType(),
+					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
+					$property->isNullable() ? ', nullable=false' : '',
+					$property->isUnique() ? ', unique=true' : ''
+				));
 
 			if ($property->getDefaultValue() !== null || $property->isNullable()) {
 				$doctrineProperty->setValue($property->getDefaultValue());

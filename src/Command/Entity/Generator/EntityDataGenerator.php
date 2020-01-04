@@ -35,8 +35,8 @@ class EntityDataGenerator
 				->setNullable($property->isNullable())
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
-			if ($defaultValue = $property->getDefaultValue()) {
-				$dataProperty->setValue($defaultValue);
+			if ($property->getDefaultValue() !== null || $property->isNullable()) {
+				$dataProperty->setValue($property->getDefaultValue());
 			}
 		}
 

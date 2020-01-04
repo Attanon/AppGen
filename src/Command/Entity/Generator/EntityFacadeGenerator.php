@@ -106,6 +106,10 @@ class EntityFacadeGenerator
 			$edit->addBody(sprintf('$%s->edit($data);', Strings::firstLower($input->getEntityClass())));
 			$edit->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
 			$edit->addBody('');
+			if (isset($eventDispatcherProperty) && $updatedEvent = $input->getEventClass('updated')) {
+				$edit->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $updatedEvent, Strings::firstLower($input->getEntityClass())));
+				$edit->addBody('');
+			}
 			$edit->addBody(sprintf('return $%s;', Strings::firstLower($input->getEntityClass())));
 		}
 

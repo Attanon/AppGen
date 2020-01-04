@@ -14,12 +14,14 @@ class EntityProperty
 	private ?int $doctrineMaxLength;
 	private ?string $defaultValue;
 	private ?bool $nullable;
+	private ?bool $unique;
 
 	public function __construct(
 		string $name,
 		string $type,
 		string $defaultValue = null,
 		?bool $nullable = null,
+		?bool $unique = false,
 		?int $doctrineMaxLength = null
 	) {
 		$this->name = $name;
@@ -29,6 +31,7 @@ class EntityProperty
 		$this->doctrineMaxLength = $this->getMaxLength($type);
 		$this->defaultValue = $defaultValue;
 		$this->nullable = $nullable;
+		$this->unique = $unique;
 		if ($nullable !== null) {
 			$this->nullable = $nullable;
 		}
@@ -136,5 +139,10 @@ class EntityProperty
 	public function __toString()
 	{
 		return $this->getName();
+	}
+
+	public function isUnique(): bool
+	{
+		return $this->unique;
 	}
 }

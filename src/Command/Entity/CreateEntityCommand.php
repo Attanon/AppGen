@@ -68,9 +68,9 @@ class CreateEntityCommand extends Command
 			$namespace,
 			$entityName,
 			[
-				new EntityProperty('test1', 'int', '5', false, 15),
-				new EntityProperty('test2', 'string', null, true, 10),
-				new EntityProperty('test3', 'bool', 'false', false, 15)
+				new EntityProperty('test1', 'int', '5', false, false, 15),
+				new EntityProperty('test2', 'string', null, true, false, 10),
+				new EntityProperty('test3', 'bool', 'false', false, false, 15)
 			],
 			true,
 			true,
