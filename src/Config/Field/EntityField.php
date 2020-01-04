@@ -14,4 +14,11 @@ class EntityField
 	public array $defaultTraits = [];
 	public ?string $removableTrait = null;
 	public ?string $timestampableTrait = null;
+
+	public function __construct(array $config)
+	{
+		foreach ($config as $key => $value) {
+			$this->$key = $value;
+		}
+	}
 }

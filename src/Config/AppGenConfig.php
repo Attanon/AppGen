@@ -8,18 +8,16 @@ use Archette\AppGen\Config\Field\EntityField;
 
 class AppGenConfig
 {
-	public string $appDir;
+	public string $appDir = 'app';
 	public EntityField $entity;
 
-	public function __construct(string $appDir = '%appDir%')
+	public function __construct(?array $config)
 	{
-		$this->appDir = $appDir;
-		$this->entity = new EntityField();
-	}
-
-	public function loadConfig(AppGenConfig $appGenConfig): void
-	{
-		$this->appDir = $appGenConfig->appDir;
-		$this->entity = $appGenConfig->entity;
+		if ($config !== null) {
+			$this->appDir = $config['appDir'];
+			$this->entity = new EntityField($config['entity']);
+		} else {
+			$this->entity = new EntityField([]);
+		}
 	}
 }
