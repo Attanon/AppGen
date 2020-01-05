@@ -166,8 +166,16 @@ class CreateModelCommand extends Command
 		}
 		$output->writeln('');
 
-		$traits = [];
+		$askTraits = [];
 		foreach ($this->config->model->entity->defaultTraits as $name => $class) {
+			if ($class === null) {
+				continue;
+			}
+			$askTraits[$name] = $class;
+		}
+
+		$traits = [];
+		foreach ($askTraits as $name => $class) {
 			if ($class === null) {
 				continue;
 			}
@@ -175,7 +183,10 @@ class CreateModelCommand extends Command
 				$traits[$name] = $class;
 			}
 		}
-		$output->writeln('');
+
+		if (!empty($askTraits)) {
+			$output->writeln('');
+		}
 
 		$input = new CreateModelResult(
 			$namespace,
