@@ -8,6 +8,7 @@ use Archette\AppGen\Command\Entity\CreateEntityInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\Type;
 use Nette\Utils\Strings;
 
 class EntityFacadeGenerator
@@ -119,11 +120,11 @@ class EntityFacadeGenerator
 
 		if ($input->createDeleteMethod()) {
 			$delete = $class->addMethod('delete')
-				->setReturnType('void')
+				->setReturnType(Type::VOID)
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
 			$delete->addParameter('id')
-				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
+				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
 
 			$delete->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
 			$delete->addBody('');

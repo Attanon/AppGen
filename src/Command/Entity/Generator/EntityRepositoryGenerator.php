@@ -8,6 +8,7 @@ use Archette\AppGen\Command\Entity\CreateEntityInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\Type;
 use Nette\Utils\Strings;
 
 class EntityRepositoryGenerator
@@ -42,7 +43,7 @@ class EntityRepositoryGenerator
 		$class->setAbstract();
 
 		$class->addProperty('entityManager')
-			->setVisibility('private')
+			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->setType('Doctrine\ORM\EntityManagerInterface');
 
 		$constructor = $class->addMethod('__construct');
@@ -51,15 +52,15 @@ class EntityRepositoryGenerator
 		$constructor->addBody('$this->entityManager = $entityManager;');
 
 		$class->addMethod('getRepository')
-			->setVisibility('private')
+			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->addComment('@return EntityRepository|ObjectRepository')
 			->addBody('return $this->entityManager->getRepository(' . $input->getEntityClass() . '::class);');
 
 		$get = $class->addMethod('get');
 		$get->addParameter('id')
-			->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
+			->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
 		$get->setReturnType($input->getEntityClass(true));
-		$get->setVisibility('public')
+		$get->setVisibility(ClassType::VISIBILITY_PUBLIC)
 			->addComment('@throws ' . $input->getNotFoundExceptionClass());
 
 		foreach ($this->createGetByBody($input->getEntityClass(), 'id') as $code) {
@@ -71,7 +72,7 @@ class EntityRepositoryGenerator
 			$method->addParameter($fieldName)
 				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
 			$method->setReturnType($input->getEntityClass(true));
-			$method->setVisibility('public')
+			$method->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@throws ' . $input->getNotFoundExceptionClass());
 			foreach ($this->createGetByBody($input->getEntityClass(), $fieldName) as $code) {
 				$method->addBody($code);
@@ -82,8 +83,8 @@ class EntityRepositoryGenerator
 			$method = $class->addMethod('getAllBy' . Strings::firstUpper($fieldName));
 			$method->addParameter($fieldName)
 				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
-			$method->setReturnType('array');
-			$method->setVisibility('public')
+			$method->setReturnType(Type::ARRAY);
+			$method->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@return ' . $input->getEntityClass() . '[]');
 			foreach ($this->createGetAllByBody($input->getEntityClass(), $fieldName) as $code) {
 				$method->addBody($code);
@@ -92,15 +93,15 @@ class EntityRepositoryGenerator
 
 		if ($input->isCreateGetAllMethod()) {
 			$class->addMethod('getAll')
-				->setReturnType('array')
-				->setVisibility('public')
+				->setReturnType(Type::ARRAY)
+				->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@return ' . $input->getEntityClass() . '[]')
 				->addBody('return $this->getQueryBuilderForAll()->getQuery()->execute();');
 		}
 
 		$class->addMethod('getQueryBuilderForAll')
 			->setReturnType('Doctrine\ORM\QueryBuilder')
-			->setVisibility('private')
+			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->addBody('return $this->getRepository()->createQueryBuilder(\'e\');');
 
 		$namespace->add($class);

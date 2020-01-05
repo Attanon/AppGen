@@ -8,6 +8,7 @@ use Archette\AppGen\Command\Entity\CreateEntityInput;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\Type;
 use Nette\Utils\Strings;
 
 class EntityGenerator
@@ -38,8 +39,8 @@ class EntityGenerator
 			->addComment('@ORM\Table(name="' . str_replace('-', '_', Strings::webalize($input->getEntityClass())) . '")');
 
 		$id = $class->addProperty('id');
-		$id->setType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
-			->setVisibility('private')
+		$id->setType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
+			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->addComment('@ORM\Id')
 			->addComment('@ORM\Column(type="' . $this->config->entity->idType . '", unique=true)');
 
@@ -78,7 +79,7 @@ class EntityGenerator
 
 		if ($input->createEditMethod()) {
 			$edit = $class->addMethod('edit')
-				->setReturnType('void');
+				->setReturnType(Type::VOID);
 
 			$edit->addParameter('data')
 				->setType($input->getDataClass(true));
@@ -91,7 +92,7 @@ class EntityGenerator
 		}
 
 		$class->addMethod('getId')
-			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : 'int')
+			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
 			->setBody('return $this->id;');
 
 		foreach ($input->getEntityProperties() as $property) {
