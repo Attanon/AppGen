@@ -64,10 +64,10 @@ class CreateModelCommand extends Command
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
 
-		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue', 'default', ['bold', 'blink']));
-		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow', 'default', ['bold', 'blink']));
-		$output->getFormatter()->setStyle('question', new OutputFormatterStyle('black', 'blue', ['bold', 'blink']));
-		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white', 'green', ['bold', 'blink']));
+		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue', null, ['bold']));
+		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow', null, ['bold']));
+		$output->getFormatter()->setStyle('question', new OutputFormatterStyle('black', null, ['bold']));
+		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white', null, ['bold']));
 
 		$output->writeln('');
 		$output->writeln('<info>#################################################</info>');
