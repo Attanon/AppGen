@@ -197,7 +197,7 @@ class CreateModelCommand extends Command
 			$path = $this->config->appDir . $path . '.php';
 
 			if (!file_exists($directory = dirname($path))) {
-				mkdir($directory, 0777, true);
+				@mkdir($directory, 0777, true);
 			}
 
 			return $path;
