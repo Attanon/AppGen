@@ -81,7 +81,7 @@ class CreateEntityCommand extends Command
 		/** @var EntityProperty[] $properties */
 		$properties = [];
 
-		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [yes] ', true))) {
+		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
 			$defineProperty = function () use ($properties, $questionHelper, $input, $output): bool {
 				$output->writeln('');
 				$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
@@ -89,7 +89,7 @@ class CreateEntityCommand extends Command
 				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
 				$properties[] = new EntityProperty($name, $type, $value);
 				$output->writeln('');
-				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [yes] ', true))) {
+				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [<info>yes</info>] ', true))) {
 					return true;
 				}
 				return false;
@@ -100,18 +100,24 @@ class CreateEntityCommand extends Command
 					break;
 				}
 			}
-
-			$output->writeln('');
 		}
+
+		$output->writeln('');
+		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> method?</blue>? [<info>yes</info>] ', true));
+		$output->writeln('');
+		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> method?</blue>? [<info>yes</info>] ', true));
+		$output->writeln('');
+		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> method?</blue>? [<info>yes</info>] ', true));
+		$output->writeln('');
 
 		$input = new CreateEntityInput(
 			$namespace,
 			$entityName,
 			$properties,
-			true,
-			true,
-			true,
-			true,
+			$createGetAllMethod,
+			$createEditMethod,
+			$createDeleteMethod,
+			false,
 			['test1' => 'string', 'test2' => 'string'],
 			['test3' => 'int'],
 			['created', 'deleted', 'updated']
