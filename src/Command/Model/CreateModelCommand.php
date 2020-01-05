@@ -157,12 +157,22 @@ class CreateModelCommand extends Command
 			break;
 		}
 
-		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define event names (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue>: ', []));
+		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define Events (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue>: ', []));
 		if (is_string($events)) {
 			if ($events === 'all') {
 				$events = 'created, updated, deleted';
 			}
 			$events = explode(',', str_replace(' ', '', $events));
+		}
+
+		$traits = [];
+		foreach ($this->config->model->entity->defaultTraits as $name => $class) {
+			if ($class === null) {
+				continue;
+			}
+			if ($questionHelper->ask($input, $output, new ConfirmationQuestion(sprintf('# <blue>Use <yellow>%s</yellow> Trait</blue>? [<info>yes</info>] ', $name), true))) {
+				$traits[$name] = $class;
+			}
 		}
 
 		$output->writeln('');
@@ -177,7 +187,8 @@ class CreateModelCommand extends Command
 			false,
 			$getByMethods,
 			$getAllByMethods,
-			$events
+			$events,
+			$traits
 		);
 
 		$filePath = function (string $namespace): string {

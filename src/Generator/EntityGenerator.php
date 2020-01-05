@@ -31,6 +31,9 @@ class EntityGenerator
 
 		$namespace->addUse('Doctrine\ORM\Mapping', 'ORM');
 		$namespace->addUse('Ramsey\Uuid\UuidInterface');
+		foreach ($input->getTraits() as $name => $class) {
+			$namespace->addUse($class);
+		}
 
 		$class = new ClassType($input->getEntityClass());
 
@@ -48,8 +51,6 @@ class EntityGenerator
 			$id->addComment('@ORM\GeneratedValue(strategy="IDENTITY")');
 		}
 
-		//TODO: Add default traits
-
 		foreach ($input->getEntityProperties() as $property) {
 			$doctrineProperty = $class->addProperty($property->getName())
 				->setType($property->getType())
@@ -65,6 +66,10 @@ class EntityGenerator
 			if ($property->getDefaultValue() !== null || $property->isNullable()) {
 				$doctrineProperty->setValue($property->getDefaultValue());
 			}
+		}
+
+		foreach ($input->getTraits() as $name => $className) {
+			$class->addTrait($className);
 		}
 
 		$constructor = $class->addMethod('__construct');

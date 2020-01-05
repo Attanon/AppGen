@@ -9,5 +9,8 @@ class EntityField
 	public string $idType = 'uuid_binary';
 	public ?string $idComment = null;
 	public bool $createSetters = false;
-	public array $defaultTraits = [];
+	public array $defaultTraits = [
+		'removable' => null,
+		'timestampable' => null
+	];
 }

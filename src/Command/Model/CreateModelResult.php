@@ -18,6 +18,7 @@ class CreateModelResult
 	private array $getByMethods = [];
 	private array $getAllByMethods = [];
 	private array $events = [];
+	private array $traits = [];
 
 	/** @var DoctrineEntityProperty[] */
 	private array $entityProperties;
@@ -32,7 +33,8 @@ class CreateModelResult
 		bool $createSoftDeleteMethod,
 		array $getByMethods = [],
 		array $getAllByMethods = [],
-		array $events = []
+		array $events = [],
+		array $traits = []
 	) {
 		$this->namespace = $namespace;
 		$this->entityClass = $entity;
@@ -41,6 +43,7 @@ class CreateModelResult
 		$this->createDeleteMethod = $createDeleteMethod;
 		$this->createSoftDeleteMethod = $createSoftDeleteMethod;
 		$this->events = $events;
+		$this->traits = $traits;
 		$this->entityProperties = $entityProperties;
 
 		foreach ($this->entityProperties as $property) {
@@ -158,5 +161,10 @@ class CreateModelResult
 		}
 
 		return false;
+	}
+
+	public function getTraits(): array
+	{
+		return $this->traits;
 	}
 }
