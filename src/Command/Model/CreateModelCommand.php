@@ -54,7 +54,7 @@ class CreateModelCommand extends Command
 
 	protected function configure(): void
 	{
-		$this->setName('appgen:entity')
+		$this->setName('appgen:model')
 			->setDescription('Create model package with entity');
 	}
 

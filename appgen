@@ -44,6 +44,6 @@ $application->add(new CreateModelCommand(
 	new EntityEventGenerator($config)
 ));
 
-$application->setDefaultCommand('appgen:entity');
+$application->setDefaultCommand('appgen:model');
 
 exit($application->run());
