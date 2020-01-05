@@ -83,17 +83,28 @@ class CreateEntityCommand extends Command
 		$propertyNames = [];
 
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
+			$lazyName = null;
 			while (true) {
 				$output->writeln('');
-				$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
+				if ($lazyName !== null) {
+					$name = $lazyName;
+					$output->writeln(sprintf('# <yellow>Property Name</yellow>: %s', $name));
+				} else {
+					$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
+				}
 				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
 				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow> [<info>none</info>]: '));
 				$output->writeln('');
 
-				$properties[] = new EntityProperty($name, $type, $value);
+				$properties[] = new EntityProperty((string) $name, $type, $value);
 				$propertyNames[] = $name;
 
-				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [<info>yes</info>] ', true))) {
+				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
+				if (strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {
+					$lazyName = null;
+					continue;
+				} else if (strtolower($defineAnother) !== 'no' && strtolower($defineAnother) !== 'n') {
+					$lazyName = $defineAnother;
 					continue;
 				}
 
