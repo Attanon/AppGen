@@ -99,7 +99,7 @@ class EntityFacadeGenerator
 			$edit->addParameter('id')
 				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
 
-			$create->addParameter('data')
+			$edit->addParameter('data')
 				->setType($input->getDataClass(true));
 
 			$edit->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
