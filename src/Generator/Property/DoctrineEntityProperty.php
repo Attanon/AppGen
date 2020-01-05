@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Model;
+namespace Archette\AppGen\Generator\Property;
 
-use Archette\AppGen\Generator\Property\Property;
 use Nette\Utils\Strings;
 
 class DoctrineEntityProperty implements Property
@@ -32,20 +31,20 @@ class DoctrineEntityProperty implements Property
 		$this->type = $this->formatType($type);
 		$this->doctrineType = $this->formatDoctrineType($type);
 
-		if ($defaultValue === '""') {
+		if ($defaultValue === '""' || $defaultValue === "''") {
 			$defaultValue = '';
+		}
+
+		if ($defaultValue === '[]') {
+			$defaultValue = [];
 		}
 
 		if ($defaultValue === 'null') {
 			$defaultValue = null;
 		}
 
-		if ($defaultValue === 'true') {
-			$defaultValue = true;
-		}
-
-		if ($defaultValue === 'false') {
-			$defaultValue = false;
+		if ($defaultValue === 'true' || $defaultValue === 'false') {
+			$defaultValue = (bool) $defaultValue;
 		}
 
 		$this->defaultValue = $defaultValue;

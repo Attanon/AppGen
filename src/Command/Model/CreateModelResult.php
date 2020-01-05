@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Command\Model;
 
+use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Nette\Utils\Strings;
 
 class CreateModelResult

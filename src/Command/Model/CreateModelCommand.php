@@ -12,6 +12,7 @@ use Archette\AppGen\Generator\EntityGenerator;
 use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
+use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -93,7 +94,7 @@ class CreateModelCommand extends Command
 					$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
 				}
 				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
-				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow> [<info>none</info>]: '));
+				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
 				$output->writeln('');
 
 				$properties[] = new DoctrineEntityProperty((string) $name, $type, $value);
@@ -156,13 +157,14 @@ class CreateModelCommand extends Command
 			break;
 		}
 
-		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define event names (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue> [<info>none</info>]: '));
-		if ($events !== null) {
+		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define event names (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue>: ', []));
+		if (is_string($events)) {
 			if ($events === 'all') {
 				$events = 'created, updated, deleted';
 			}
 			$events = explode(',', str_replace(' ', '', $events));
 		}
+
 		$output->writeln('');
 
 		$input = new CreateModelResult(
