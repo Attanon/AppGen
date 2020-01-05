@@ -13,9 +13,11 @@ use Archette\AppGen\Command\Entity\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Command\Entity\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 class CreateEntityCommand extends Command
@@ -56,22 +58,56 @@ class CreateEntityCommand extends Command
 			->setDescription('Create model package with entity');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): void
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
 
-		$namespace = trim($questionHelper->ask($input, $output, new Question('Namespace: ')), '\\');
-		$entityName = $questionHelper->ask($input, $output, new Question('Entity name: '));
+		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue', 'default', ['bold', 'blink']));
+		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow', 'default', ['bold', 'blink']));
+		$output->getFormatter()->setStyle('question', new OutputFormatterStyle('black', 'blue', ['bold', 'blink']));
+		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white', 'green', ['bold', 'blink']));
+
+		$output->writeln('');
+		$output->writeln('<info>#################################################</info>');
+		$output->writeln('<info>~</info> Welcome to <blue>AppGen v0.1</blue> created by <blue>Rick Strafy</blue> <info>~</info>');
+		$output->writeln('<info>#################################################</info>');
+		$output->writeln('');
+
+		$entityName = $questionHelper->ask($input, $output, new Question('# <blue>Entity Name</blue>: '));
+		$namespace = trim($questionHelper->ask($input, $output, new Question('# <blue>Namespace</blue>: ')), '\\');
+		$output->writeln('');
+
+		/** @var EntityProperty[] $properties */
+		$properties = [];
+
+		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [yes] ', true))) {
+			$defineProperty = function () use ($properties, $questionHelper, $input, $output): bool {
+				$output->writeln('');
+				$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
+				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Property Type</yellow> (e.g. "<blue>?string|31 --unique</blue>"): '));
+				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
+				$properties[] = new EntityProperty($name, $type, $value);
+				$output->writeln('');
+				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [yes] ', true))) {
+					return true;
+				}
+				return false;
+			};
+
+			while (true) {
+				if (!$defineProperty()) {
+					break;
+				}
+			}
+
+			$output->writeln('');
+		}
 
 		$input = new CreateEntityInput(
 			$namespace,
 			$entityName,
-			[
-				new EntityProperty('test1', 'int', '5', false, false, 15),
-				new EntityProperty('test2', 'string', null, true, false, 10),
-				new EntityProperty('test3', 'bool', 'false', false, false, 15)
-			],
+			$properties,
 			true,
 			true,
 			true,
@@ -113,6 +149,8 @@ class CreateEntityCommand extends Command
 			file_put_contents($location, $content);
 		}
 
-		$output->writeln('Done');
+		$output->writeln('<info>Entity package</info> <blue>successfully</blue> <info>created!</info>');
+
+		return 1;
 	}
 }

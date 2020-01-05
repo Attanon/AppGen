@@ -74,7 +74,7 @@ class EntityGenerator
 		$constructor->addParameter('data')
 			->setType($input->getDataClass(true));
 
-		$constructor->addBody('$this->id = $id');
+		$constructor->addBody('$this->id = $id;');
 
 		if ($input->createEditMethod()) {
 			$edit = $class->addMethod('edit')
@@ -85,7 +85,7 @@ class EntityGenerator
 
 			foreach ($input->getEntityProperties() as $property) {
 				if ($property->getName() !== 'updatedAt' && $property->getName() !== 'createdAt') {
-					$edit->addBody(sprintf('$this->%1$s = $data->%1$s', $property->getName()));
+					$edit->addBody(sprintf('$this->%1$s = $data->%1$s;', $property->getName()));
 				}
 			}
 		}
@@ -98,7 +98,7 @@ class EntityGenerator
 			$class->addMethod(($property->isBoolean() ? 'is' : 'get') . Strings::firstUpper($property->getName()))
 				->setReturnType($property->getType())
 				->setReturnNullable($property->isNullable())
-				->setBody(sprintf('return $%s;', $property->getName()));
+				->setBody(sprintf('return $this->%s;', $property->getName()));
 		}
 
 		$namespace->add($class);

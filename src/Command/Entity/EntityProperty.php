@@ -19,25 +19,18 @@ class EntityProperty
 	public function __construct(
 		string $name,
 		string $type,
-		string $defaultValue = null,
-		?bool $nullable = null,
-		?bool $unique = false,
-		?int $doctrineMaxLength = null
+		string $defaultValue = null
 	) {
 		$this->name = $name;
 		$this->nullable = $this->isTypeNullable($type);
+		$this->unique = $this->isTypeUnique($type);
+
+		$type = trim(explode(' ', $type)[0], '?');
+
 		$this->type = $this->formatType($type);
 		$this->doctrineType = $this->formatDoctrineType($type);
 		$this->doctrineMaxLength = $this->getMaxLength($type);
 		$this->defaultValue = $defaultValue;
-		$this->nullable = $nullable;
-		$this->unique = $unique;
-		if ($nullable !== null) {
-			$this->nullable = $nullable;
-		}
-		if ($doctrineMaxLength !== null) {
-			$this->doctrineMaxLength = $doctrineMaxLength;
-		}
 	}
 
 	private function isTypeNullable(string $type): bool
@@ -45,8 +38,17 @@ class EntityProperty
 		return Strings::startsWith($type, '?');
 	}
 
+	private function isTypeUnique(string $type): bool
+	{
+		return Strings::contains($type, ' --unique');
+	}
+
 	private function getMaxLength(string $type): ?int
 	{
+		if (count($split = explode('|', $type)) > 1) {
+			return (int) $split[1];
+		}
+
 		if (count($split = explode(':', $type)) > 1) {
 			return (int) $split[1];
 		}
@@ -72,6 +74,10 @@ class EntityProperty
 	private function formatType(string $type): string
 	{
 		$type = trim(strtolower($type), '?');
+
+		if (Strings::contains($type, 'text')) {
+			return 'string';
+		}
 
 		if (Strings::contains($type, 'boolean')) {
 			return 'bool';

@@ -36,4 +36,4 @@ $application->add(new CreateEntityCommand(
 
 $application->setDefaultCommand('appgen:entity');
 
-$application->run();
+exit($application->run());
