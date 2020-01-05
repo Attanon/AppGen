@@ -30,6 +30,23 @@ class EntityProperty
 		$this->type = $this->formatType($type);
 		$this->doctrineType = $this->formatDoctrineType($type);
 		$this->doctrineMaxLength = $this->getMaxLength($type);
+
+		if ($defaultValue === '""') {
+			$defaultValue = '';
+		}
+
+		if ($defaultValue === 'null') {
+			$defaultValue = null;
+		}
+
+		if ($defaultValue === 'true') {
+			$defaultValue = true;
+		}
+
+		if ($defaultValue === 'false') {
+			$defaultValue = false;
+		}
+
 		$this->defaultValue = $defaultValue;
 	}
 

@@ -14,9 +14,9 @@ class CreateEntityInput
 	private bool $createEditMethod;
 	private bool $createDeleteMethod;
 	private bool $createSoftDeleteMethod;
-	private array $getByMethods;
-	private array $getAllByMethods;
-	private array $events;
+	private array $getByMethods = [];
+	private array $getAllByMethods = [];
+	private array $events = [];
 
 	/** @var EntityProperty[] */
 	private array $entityProperties;
@@ -35,14 +35,21 @@ class CreateEntityInput
 	) {
 		$this->namespace = $namespace;
 		$this->entityClass = $entity;
-		$this->entityProperties = $entityProperties;
 		$this->createGetAllMethod = $createGetAllMethod;
 		$this->createEditMethod = $createEditMethod;
 		$this->createDeleteMethod = $createDeleteMethod;
 		$this->createSoftDeleteMethod = $createSoftDeleteMethod;
-		$this->getByMethods = $getByMethods;
-		$this->getAllByMethods = $getAllByMethods;
 		$this->events = $events;
+		$this->entityProperties = $entityProperties;
+
+		foreach ($this->entityProperties as $property) {
+			if (in_array($property->getName(), $getByMethods, true)) {
+				$this->getByMethods[$property->getName()] = $property->getType();
+			}
+			if (in_array($property->getName(), $getAllByMethods, true)) {
+				$this->getAllByMethods[$property->getName()] = $property->getType();
+			}
+		}
 	}
 
 	public function getNamespace(): string
@@ -139,5 +146,16 @@ class CreateEntityInput
 	public function getEntityProperties(): array
 	{
 		return $this->entityProperties;
+	}
+
+	public function hasProperty(string $name): bool
+	{
+		foreach ($this->entityProperties as $property) {
+			if ($property->getName() === $name) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -80,34 +80,78 @@ class CreateEntityCommand extends Command
 
 		/** @var EntityProperty[] $properties */
 		$properties = [];
+		$propertyNames = [];
 
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
-			$defineProperty = function () use ($properties, $questionHelper, $input, $output): bool {
+			while (true) {
 				$output->writeln('');
 				$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
-				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Property Type</yellow> (e.g. "<blue>?string|31 --unique</blue>"): '));
-				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
-				$properties[] = new EntityProperty($name, $type, $value);
+				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
+				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow> [<info>none</info>]: '));
 				$output->writeln('');
-				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [<info>yes</info>] ', true))) {
-					return true;
-				}
-				return false;
-			};
 
-			while (true) {
-				if (!$defineProperty()) {
-					break;
+				$properties[] = new EntityProperty($name, $type, $value);
+				$propertyNames[] = $name;
+
+				if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Another Property</blue>? [<info>yes</info>] ', true))) {
+					continue;
 				}
+
+				break;
 			}
 		}
 
 		$output->writeln('');
-		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> method?</blue>? [<info>yes</info>] ', true));
+		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> Method</blue>? [<info>yes</info>] ', true));
+		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> Method</blue>? [<info>yes</info>] ', true));
+		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$output->writeln('');
-		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> method?</blue>? [<info>yes</info>] ', true));
-		$output->writeln('');
-		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> method?</blue>? [<info>yes</info>] ', true));
+
+		$getByMethods = [];
+		while (true) {
+			$getByMethods = $questionHelper->ask($input, $output, new Question('# <blue>Define Fields for <yellow>getBy<Field></yellow> Methods (e.g. "<yellow>email, slug</yellow>")</blue>: ', []));
+			if (is_string($getByMethods)) {
+				$getByMethods = explode(',', str_replace(' ', '', $getByMethods));
+			}
+
+			foreach ($getByMethods as $getByMethod) {
+				if (!in_array($getByMethod, $propertyNames)) {
+					$output->writeln('');
+					$output->writeln(sprintf('<error>Error! Property "%s" does not exist!</error>', $getByMethod));
+					$output->writeln('');
+					continue 2;
+				}
+			}
+
+			break;
+		}
+
+		$getAllByMethods = [];
+		while (true) {
+			$getAllByMethods = $questionHelper->ask($input, $output, new Question('# <blue>Define Fields for <yellow>getAllBy<Field></yellow> Methods (e.g. "<yellow>author, type</yellow>")</blue>: ', []));
+			if (is_string($getAllByMethods)) {
+				$getAllByMethods = explode(',', str_replace(' ', '', $getAllByMethods));
+			}
+
+			foreach ($getAllByMethods as $getAllByMethod) {
+				if (!in_array($getAllByMethod, $propertyNames)) {
+					$output->writeln('');
+					$output->writeln(sprintf('<error>Error! Property "%s" does not exist!</error>', $getAllByMethod));
+					$output->writeln('');
+					continue 2;
+				}
+			}
+
+			break;
+		}
+
+		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define event names (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue> [<info>none</info>]: '));
+		if ($events !== null) {
+			if ($events === 'all') {
+				$events = 'created, updated, deleted';
+			}
+			$events = explode(',', str_replace(' ', '', $events));
+		}
 		$output->writeln('');
 
 		$input = new CreateEntityInput(
@@ -118,9 +162,9 @@ class CreateEntityCommand extends Command
 			$createEditMethod,
 			$createDeleteMethod,
 			false,
-			['test1' => 'string', 'test2' => 'string'],
-			['test3' => 'int'],
-			['created', 'deleted', 'updated']
+			$getByMethods,
+			$getAllByMethods,
+			$events
 		);
 
 		$filePath = function (string $namespace): string {
@@ -155,7 +199,13 @@ class CreateEntityCommand extends Command
 			file_put_contents($location, $content);
 		}
 
-		$output->writeln('<info>Entity package</info> <blue>successfully</blue> <info>created!</info>');
+		$output->writeln('<yellow>Entity</yellow>, <yellow>DTO</yellow>, <yellow>Factory</yellow>, <yellow>Repository</yellow>, <yellow>Facade</yellow> and <yellow>Events</yellow> were <info>successfully</info> created!');
+		$output->writeln('');
+
+		$output->writeln('Files created:');
+		foreach ($classMap as $file => $class) {
+			$output->writeln(sprintf('<info>%s</info>', $file));
+		}
 
 		return 1;
 	}
