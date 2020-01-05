@@ -38,6 +38,7 @@ class EntityRepositoryGenerator
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
 		$namespace->addUse($input->getNotFoundExceptionClass(true));
+		$namespace->addUse('Doctrine\Common\Persistence\ObjectRepository');
 
 		$class = new ClassType($input->getRepositoryClass());
 		$class->setAbstract();
