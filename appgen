@@ -15,14 +15,23 @@ use Archette\AppGen\Command\Entity\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Command\Entity\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\Neon\Neon;
+use Nette\Schema\Expect;
+use Nette\Schema\Processor;
 use Symfony\Component\Console\Application;
 
 if (!file_exists($configFile = 'appgen.neon')) {
-	file_put_contents($configFile, Neon::encode(new AppGenConfig(null), Neon::BLOCK));
+	file_put_contents($configFile, Neon::encode(new AppGenConfig(), Neon::BLOCK));
+}
+
+$processor = new Processor();
+
+try {
+	$config = $processor->process(Expect::from(new AppGenConfig()), Neon::decode(file_get_contents($configFile)));
+} catch (Nette\Schema\ValidationException $e) {
+	exit(PHP_EOL . 'Config is invalid!: ' . PHP_EOL . $e->getMessage() . PHP_EOL);
 }
 
 $application = new Application();
-$config = new AppGenConfig(Neon::decode(file_get_contents($configFile)));
 
 $application->add(new CreateEntityCommand(
 	$config,

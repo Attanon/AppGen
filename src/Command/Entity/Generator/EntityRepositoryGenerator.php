@@ -34,7 +34,7 @@ class EntityRepositoryGenerator
 		$namespace->addUse('Doctrine\ORM\EntityManagerInterface');
 		$namespace->addUse('Doctrine\ORM\EntityRepository');
 		$namespace->addUse('Doctrine\ORM\QueryBuilder');
-		if (Strings::contains($this->config->entity->idType, 'uuid')) {
+		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
 		$namespace->addUse($input->getNotFoundExceptionClass(true));
@@ -59,7 +59,7 @@ class EntityRepositoryGenerator
 
 		$get = $class->addMethod('get');
 		$get->addParameter('id')
-			->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
+			->setType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
 		$get->setReturnType($input->getEntityClass(true));
 		$get->setVisibility(ClassType::VISIBILITY_PUBLIC)
 			->addComment('@throws ' . $input->getNotFoundExceptionClass());

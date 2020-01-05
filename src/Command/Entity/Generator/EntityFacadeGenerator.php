@@ -33,7 +33,7 @@ class EntityFacadeGenerator
 		if ($input->hasEvents()) {
 			$namespace->addUse('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
 		}
-		if (Strings::contains($this->config->entity->idType, 'uuid')) {
+		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
 
@@ -97,7 +97,7 @@ class EntityFacadeGenerator
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
 			$edit->addParameter('id')
-				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
+				->setType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
 
 			$edit->addParameter('data')
 				->setType($input->getDataClass(true));
@@ -114,17 +114,13 @@ class EntityFacadeGenerator
 			$edit->addBody(sprintf('return $%s;', Strings::firstLower($input->getEntityClass())));
 		}
 
-		if ($input->createSoftDeleteMethod()) {
-			//TODO: Implement soft-delete trait
-		}
-
 		if ($input->createDeleteMethod()) {
 			$delete = $class->addMethod('delete')
 				->setReturnType(Type::VOID)
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
 			$delete->addParameter('id')
-				->setType(Strings::contains($this->config->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
+				->setType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
 
 			$delete->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
 			$delete->addBody('');

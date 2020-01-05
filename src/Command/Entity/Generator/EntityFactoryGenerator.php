@@ -27,7 +27,7 @@ class EntityFactoryGenerator
 		$file->setStrictTypes();
 
 		$namespace = $file->addNamespace($input->getNamespace());
-		if (Strings::contains($this->config->entity->idType, 'uuid')) {
+		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
 

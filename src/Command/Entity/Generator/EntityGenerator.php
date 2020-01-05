@@ -39,12 +39,12 @@ class EntityGenerator
 			->addComment('@ORM\Table(name="' . str_replace('-', '_', Strings::webalize($input->getEntityClass())) . '")');
 
 		$id = $class->addProperty('id');
-		$id->setType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
+		$id->setType($this->config->model->entity->idType === 'uuid' || $this->config->model->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
 			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->addComment('@ORM\Id')
-			->addComment('@ORM\Column(type="' . $this->config->entity->idType . '", unique=true)');
+			->addComment('@ORM\Column(type="' . $this->config->model->entity->idType . '", unique=true)');
 
-		if ($this->config->entity->idType === 'integer') {
+		if ($this->config->model->entity->idType === 'integer') {
 			$id->addComment('@ORM\GeneratedValue(strategy="IDENTITY")');
 		}
 
@@ -92,7 +92,7 @@ class EntityGenerator
 		}
 
 		$class->addMethod('getId')
-			->setReturnType($this->config->entity->idType === 'uuid' || $this->config->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
+			->setReturnType($this->config->model->entity->idType === 'uuid' || $this->config->model->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
 			->setBody('return $this->id;');
 
 		foreach ($input->getEntityProperties() as $property) {

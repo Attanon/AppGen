@@ -12,6 +12,7 @@
     "minimum-stability": "dev",
     "require": {
         "nette/neon": "^3.1",
+        "nette/schema": "^1.0",
         "nette/php-generator": "^3.3",
         "symfony/console": "^5.0"
     },

@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Config;
 
-use Archette\AppGen\Config\Field\EntityField;
+use Archette\AppGen\Config\Field\ModelField;
 
 class AppGenConfig
 {
 	public string $appDir = 'app';
-	public EntityField $entity;
+	public ModelField $model;
 
-	public function __construct(?array $config)
+	public function __construct()
 	{
-		if ($config !== null) {
-			$this->appDir = $config['appDir'];
-			$this->entity = new EntityField($config['entity']);
-		} else {
-			$this->entity = new EntityField([]);
-		}
+		$this->model = new ModelField();
 	}
 }
