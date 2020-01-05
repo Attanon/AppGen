@@ -242,6 +242,8 @@ class CreateModelCommand extends Command
 			$output->writeln(sprintf('<info>%s</info>', $file));
 		}
 
+		$output->writeln('');
+
 		return 1;
 	}
 }
