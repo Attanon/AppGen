@@ -100,7 +100,7 @@ class CreateEntityCommand extends Command
 				$propertyNames[] = $name;
 
 				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
-				if (strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {
+				if ($defineAnother === null || strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {
 					$lazyName = null;
 					continue;
 				} else if (strtolower($defineAnother) !== 'no' && strtolower($defineAnother) !== 'n') {

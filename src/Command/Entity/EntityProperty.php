@@ -24,12 +24,12 @@ class EntityProperty
 		$this->name = $name;
 		$this->nullable = $this->isTypeNullable($type);
 		$this->unique = $this->isTypeUnique($type);
+		$this->doctrineMaxLength = $this->getMaxLength($type);
 
-		$type = trim(explode(' ', $type)[0], '?');
+		$type = explode(':', explode('|', trim(explode(' ', $type)[0], '?'))[0])[0];
 
 		$this->type = $this->formatType($type);
 		$this->doctrineType = $this->formatDoctrineType($type);
-		$this->doctrineMaxLength = $this->getMaxLength($type);
 
 		if ($defaultValue === '""') {
 			$defaultValue = '';
