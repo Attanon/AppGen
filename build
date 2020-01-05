@@ -8,6 +8,6 @@ require 'vendor/autoload.php';
 $p = new Phar($fileName);
 
 $p->startBuffering();
-$p->buildFromDirectory(__DIR__, '/\.php|appgen$/');
-$p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('appgen'));
+$p->buildFromDirectory(__DIR__, '/\.php$/');
+$p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('bootstrap.php'));
 $p->stopBuffering();
