@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Entity;
+namespace Archette\AppGen\Command\Model;
 
+use Archette\AppGen\Generator\Property\Property;
 use Nette\Utils\Strings;
 
-class EntityProperty
+class DoctrineEntityProperty implements Property
 {
 	private string $name;
 	private string $type;

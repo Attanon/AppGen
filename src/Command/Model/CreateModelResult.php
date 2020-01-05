@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Entity;
+namespace Archette\AppGen\Command\Model;
 
 use Nette\Utils\Strings;
 
-class CreateEntityInput
+class CreateModelResult
 {
 	private string $namespace;
 	private string $entityClass;
@@ -18,7 +18,7 @@ class CreateEntityInput
 	private array $getAllByMethods = [];
 	private array $events = [];
 
-	/** @var EntityProperty[] */
+	/** @var DoctrineEntityProperty[] */
 	private array $entityProperties;
 
 	public function __construct(
@@ -142,7 +142,7 @@ class CreateEntityInput
 		return $this->createSoftDeleteMethod;
 	}
 
-	/** @return EntityProperty[] */
+	/** @return DoctrineEntityProperty[] */
 	public function getEntityProperties(): array
 	{
 		return $this->entityProperties;

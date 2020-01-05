@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Entity\Generator;
+namespace Archette\AppGen\Generator;
 
-use Archette\AppGen\Command\Entity\CreateEntityInput;
+use Archette\AppGen\Command\Model\CreateModelResult;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
@@ -20,7 +20,7 @@ class EntityEventGenerator
 		$this->config = $config;
 	}
 
-	public function create(CreateEntityInput $input, string $eventName): string
+	public function create(CreateModelResult $input, string $eventName): string
 	{
 		$file = new PhpFile();
 

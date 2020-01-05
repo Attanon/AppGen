@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Archette\AppGen\Command\Entity;
+namespace Archette\AppGen\Command\Model;
 
-use Archette\AppGen\Command\Entity\Generator\EntityDataGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityEventGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityFacadeGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityFactoryGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityNotFoundExceptionGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityRepositoryGenerator;
+use Archette\AppGen\Generator\EntityDataGenerator;
+use Archette\AppGen\Generator\EntityEventGenerator;
+use Archette\AppGen\Generator\EntityFacadeGenerator;
+use Archette\AppGen\Generator\EntityFactoryGenerator;
+use Archette\AppGen\Generator\EntityGenerator;
+use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
+use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class CreateEntityCommand extends Command
+class CreateModelCommand extends Command
 {
 	private AppGenConfig $config;
 	private EntityGenerator $entityGenerator;
@@ -78,7 +78,7 @@ class CreateEntityCommand extends Command
 		$namespace = trim($questionHelper->ask($input, $output, new Question('# <blue>Namespace</blue>: ')), '\\');
 		$output->writeln('');
 
-		/** @var EntityProperty[] $properties */
+		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
 		$propertyNames = [];
 
@@ -96,7 +96,7 @@ class CreateEntityCommand extends Command
 				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow> [<info>none</info>]: '));
 				$output->writeln('');
 
-				$properties[] = new EntityProperty((string) $name, $type, $value);
+				$properties[] = new DoctrineEntityProperty((string) $name, $type, $value);
 				$propertyNames[] = $name;
 
 				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
@@ -165,7 +165,7 @@ class CreateEntityCommand extends Command
 		}
 		$output->writeln('');
 
-		$input = new CreateEntityInput(
+		$input = new CreateModelResult(
 			$namespace,
 			$entityName,
 			$properties,

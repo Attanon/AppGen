@@ -5,14 +5,14 @@ declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
-use Archette\AppGen\Command\Entity\CreateEntityCommand;
-use Archette\AppGen\Command\Entity\Generator\EntityDataGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityEventGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityFacadeGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityFactoryGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityNotFoundExceptionGenerator;
-use Archette\AppGen\Command\Entity\Generator\EntityRepositoryGenerator;
+use Archette\AppGen\Command\Model\CreateModelCommand;
+use Archette\AppGen\Generator\EntityDataGenerator;
+use Archette\AppGen\Generator\EntityEventGenerator;
+use Archette\AppGen\Generator\EntityFacadeGenerator;
+use Archette\AppGen\Generator\EntityFactoryGenerator;
+use Archette\AppGen\Generator\EntityGenerator;
+use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
+use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\Neon\Neon;
 use Nette\Schema\Expect;
@@ -33,7 +33,7 @@ try {
 
 $application = new Application();
 
-$application->add(new CreateEntityCommand(
+$application->add(new CreateModelCommand(
 	$config,
 	new EntityGenerator($config),
 	new EntityDataGenerator($config),
