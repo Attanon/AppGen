@@ -4,6 +4,7 @@
 require 'vendor/autoload.php';
 
 @unlink($fileName = 'bin/appgen.phar');
+@unlink('bin/appgen');
 
 $p = new Phar($fileName);
 
@@ -11,3 +12,5 @@ $p->startBuffering();
 $p->buildFromDirectory(__DIR__, '/\.php$/');
 $p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('bootstrap.php'));
 $p->stopBuffering();
+
+copy($fileName, 'bin/appgen');
