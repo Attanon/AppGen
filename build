@@ -9,5 +9,5 @@ $p = new Phar($fileName);
 
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__, '/\.php|appgen$/');
-$p->setStub($p->createDefaultStub('appgen'));
+$p->setStub("#!/usr/bin/php \n" . $p->createDefaultStub('appgen'));
 $p->stopBuffering();
