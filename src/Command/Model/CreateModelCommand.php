@@ -164,6 +164,7 @@ class CreateModelCommand extends Command
 			}
 			$events = explode(',', str_replace(' ', '', $events));
 		}
+		$output->writeln('');
 
 		$traits = [];
 		foreach ($this->config->model->entity->defaultTraits as $name => $class) {
@@ -174,7 +175,6 @@ class CreateModelCommand extends Command
 				$traits[$name] = $class;
 			}
 		}
-
 		$output->writeln('');
 
 		$input = new CreateModelResult(

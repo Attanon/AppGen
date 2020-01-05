@@ -134,6 +134,6 @@ class EntityFacadeGenerator
 
 		$namespace->add($class);
 
-		return (string) $file;
+		return str_replace("\n\n\tprivate", "\n\tprivate", (string) $file);
 	}
 }
