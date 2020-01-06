@@ -1,6 +1,6 @@
 {
     "name": "archette/appgen",
-    "description": "Nette code generator to speed up development",
+    "description": "Model layer (Doctrine ORM) generator to speed up development",
     "type": "library",
     "license": "MIT",
     "authors": [
