@@ -43,6 +43,5 @@ class EntityDataGenerator
 		$namespace->add($class);
 
 		return str_replace("\n\n\t", "\n\t", (string) $file);
-		//return str_replace(["\r", "\n", "\t"], ['\r', '\n', '\t'], (string) $file);
 	}
 }

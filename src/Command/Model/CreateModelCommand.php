@@ -64,14 +64,13 @@ class CreateModelCommand extends Command
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
 
-		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue', null, ['bold']));
-		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow', null, ['bold']));
-		$output->getFormatter()->setStyle('question', new OutputFormatterStyle('black', null, ['bold']));
-		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white', null, ['bold']));
+		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue'));
+		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow'));
+		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white'));
 
 		$output->writeln('');
 		$output->writeln('<info>#################################################</info>');
-		$output->writeln('<info>~</info> Welcome to <blue>AppGen v0.1</blue> created by <blue>Rick Strafy</blue> <info>~</info>');
+		$output->writeln(sprintf('<info>~</info> Welcome to <blue>AppGen v%s</blue> created by <blue>Rick Strafy</blue> <info>~</info>', APPGEN_VERSION));
 		$output->writeln('<info>#################################################</info>');
 		$output->writeln('');
 

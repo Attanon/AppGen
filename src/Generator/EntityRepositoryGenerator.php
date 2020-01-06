@@ -87,7 +87,7 @@ class EntityRepositoryGenerator
 			$method->setReturnType(Type::ARRAY);
 			$method->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@return ' . $input->getEntityClass() . '[]');
-			foreach ($this->createGetAllByBody($input->getEntityClass(), $fieldName) as $code) {
+			foreach ($this->createGetAllByBody($fieldName) as $code) {
 				$method->addBody($code);
 			}
 		}
@@ -128,7 +128,7 @@ class EntityRepositoryGenerator
 		return $code;
 	}
 
-	private function createGetAllByBody(string $entityName, string $fieldName): array
+	private function createGetAllByBody(string $fieldName): array
 	{
 		$code = [];
 

@@ -1,4 +1,4 @@
-appDir: example
+appDir: tests
 model:
 	entity:
 		idType: uuid_binary

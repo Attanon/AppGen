@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require __DIR__ . '/vendor/autoload.php';
 
 use Archette\AppGen\Command\Model\CreateModelCommand;
@@ -16,8 +18,10 @@ use Nette\Schema\Expect;
 use Nette\Schema\Processor;
 use Symfony\Component\Console\Application;
 
+define('APPGEN_VERSION', '0.1');
+
 if (!file_exists($configFile = 'appgen.neon')) {
-	file_put_contents($configFile, Neon::encode(new AppGenConfig(), [Neon::BLOCK, Neon::BLOCK]));
+	file_put_contents($configFile, Neon::encode(new AppGenConfig(), Neon::BLOCK));
 }
 
 $processor = new Processor();
