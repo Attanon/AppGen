@@ -1,5 +1,5 @@
 # AppGen
-🖨️ Nette code generator to speed up development
+🖨️ Model layer (Doctrine ORM) generator to speed up development
 
 # Installation
 ```
