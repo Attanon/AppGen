@@ -10,7 +10,7 @@ $p = new Phar($fileName);
 
 $p->startBuffering();
 $p->buildFromDirectory(__DIR__, '/\.php$/');
-$p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('bootstrap.php'));
+$p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('kernel.php'));
 $p->stopBuffering();
 
 copy($fileName, 'bin/appgen');

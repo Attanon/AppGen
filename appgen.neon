@@ -1,4 +1,4 @@
-appDir: tests
+appDir: app
 model:
 	entity:
 		idType: uuid_binary
@@ -6,6 +6,7 @@ model:
 		createSetters: false
 		defaultTraits:
 			removable: null
-			timestampable: \Test\Test
+			timestampable: null
 
 	symfonyEvents: true
+
