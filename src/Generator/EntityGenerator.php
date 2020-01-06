@@ -106,6 +106,13 @@ class EntityGenerator
 				->setReturnType($property->getType())
 				->setReturnNullable($property->isNullable())
 				->setBody(sprintf('return $this->%s;', $property->getName()));
+			if ($this->config->model->entity->createSetters) {
+				$class->addMethod('set'. Strings::firstUpper($property->getName()))
+					->setReturnType(Type::VOID)
+					->setBody(sprintf('$this->%1$s = $%1$s;', $property->getName()))
+					->addParameter($property->getName())
+					->setType($property->getType());
+			}
 		}
 
 		$namespace->add($class);
