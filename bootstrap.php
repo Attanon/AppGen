@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/vendor/autoload.php';
 
 use Archette\AppGen\Command\Model\CreateModelCommand;
+use Archette\AppGen\Generator\EntityDataFactoryGenerator;
 use Archette\AppGen\Generator\EntityDataGenerator;
 use Archette\AppGen\Generator\EntityEventGenerator;
 use Archette\AppGen\Generator\EntityFacadeGenerator;
@@ -38,6 +39,7 @@ $application->add(new CreateModelCommand(
 	$config,
 	new EntityGenerator($config),
 	new EntityDataGenerator($config),
+	new EntityDataFactoryGenerator($config),
 	new EntityFactoryGenerator($config),
 	new EntityRepositoryGenerator($config),
 	new EntityFacadeGenerator($config),

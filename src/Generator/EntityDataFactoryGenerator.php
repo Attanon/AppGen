@@ -8,8 +8,9 @@ use Archette\AppGen\Command\Model\CreateModelResult;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\Type;
 
-class EntityDataGenerator
+class EntityDataFactoryGenerator
 {
 	private AppGenConfig $config;
 
@@ -27,22 +28,23 @@ class EntityDataGenerator
 
 		$namespace = $file->addNamespace($input->getNamespace());
 
-		$class = new ClassType($input->getDataClass());
+		$class = new ClassType($input->getDataFactoryClass());
 		$class->setFinal();
+		$create = $class->addMethod('createFromFormData')
+			->setReturnType($input->getDataClass(true));
+		$create->addParameter('formData')
+			->setType(Type::ARRAY);
+		$create->addBody(sprintf('$data = new %s();', $input->getDataClass()));
 
 		foreach ($input->getEntityProperties() as $property) {
-			$dataProperty = $class->addProperty($property->getName())
-				->setType($property->getType())
-				->setNullable($property->isNullable())
-				->setVisibility(ClassType::VISIBILITY_PUBLIC);
-
-			if ($property->getDefaultValue() !== null || $property->isNullable()) {
-				$dataProperty->setValue($property->getDefaultValue());
-			}
+			$create->addBody(sprintf('$data->%1$s = $formData[\'%1$s\'];', $property->getName()));
 		}
+
+		$create->addBody('');
+		$create->addBody('return $data;');
 
 		$namespace->add($class);
 
-		return str_replace("\n\n\t", "\n\t", (string) $file);
+		return (string) $file;
 	}
 }

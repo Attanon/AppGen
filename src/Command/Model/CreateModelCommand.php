@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Command\Model;
 
+use Archette\AppGen\Generator\EntityDataFactoryGenerator;
 use Archette\AppGen\Generator\EntityDataGenerator;
 use Archette\AppGen\Generator\EntityEventGenerator;
 use Archette\AppGen\Generator\EntityFacadeGenerator;
@@ -26,6 +27,7 @@ class CreateModelCommand extends Command
 	private AppGenConfig $config;
 	private EntityGenerator $entityGenerator;
 	private EntityDataGenerator $entityDataGenerator;
+	private EntityDataFactoryGenerator $entityDataFactoryGenerator;
 	private EntityFactoryGenerator $entityFactoryGenerator;
 	private EntityRepositoryGenerator $entityRepositoryGenerator;
 	private EntityFacadeGenerator $entityFacadeGenerator;
@@ -36,6 +38,7 @@ class CreateModelCommand extends Command
 		AppGenConfig $config,
 		EntityGenerator $entityGenerator,
 		EntityDataGenerator $entityDataGenerator,
+		EntityDataFactoryGenerator $entityDataFactoryGenerator,
 		EntityFactoryGenerator $entityFactoryGenerator,
 		EntityRepositoryGenerator $entityRepositoryGenerator,
 		EntityFacadeGenerator $entityFacadeGenerator,
@@ -46,6 +49,7 @@ class CreateModelCommand extends Command
 		$this->config = $config;
 		$this->entityGenerator = $entityGenerator;
 		$this->entityDataGenerator = $entityDataGenerator;
+		$this->entityDataFactoryGenerator = $entityDataFactoryGenerator;
 		$this->entityFactoryGenerator = $entityFactoryGenerator;
 		$this->entityRepositoryGenerator = $entityRepositoryGenerator;
 		$this->entityFacadeGenerator = $entityFacadeGenerator;
@@ -113,6 +117,7 @@ class CreateModelCommand extends Command
 		}
 
 		$output->writeln('');
+		$createDataFactory = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>DataFactory</yellow> Class for Form Handling</blue>? [<info>yes</info>] ', true));
 		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> Method</blue>? [<info>yes</info>] ', true));
@@ -226,6 +231,10 @@ class CreateModelCommand extends Command
 			$filePath($input->getFacadeClass(true)) => $this->entityFacadeGenerator->create($input),
 			$filePath($input->getNotFoundExceptionClass(true)) => $this->entityNotFoundExceptionGenerator->create($input)
 		], $eventMap);
+
+		if ($createDataFactory) {
+			$classMap = $classMap + [$filePath($input->getDataFactoryClass(true)) => $this->entityDataFactoryGenerator->create($input)];
+		}
 
 		$classMap = array_map(fn($content) => preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\r\n\r\n", $content), $classMap);
 

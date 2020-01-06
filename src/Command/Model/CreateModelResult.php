@@ -78,22 +78,27 @@ class CreateModelResult
 
 	public function getDataClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Data';
+		return $this->getEntityClass($withNamespace) . 'Data';
+	}
+
+	public function getDataFactoryClass(bool $withNamespace = false): string
+	{
+		return $this->getDataClass($withNamespace) . 'Factory';
 	}
 
 	public function getFactoryClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Factory';
+		return $this->getEntityClass($withNamespace) . 'Factory';
 	}
 
 	public function getRepositoryClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Repository';
+		return $this->getEntityClass($withNamespace) . 'Repository';
 	}
 
 	public function getFacadeClass(bool $withNamespace = false): string
 	{
-		return ($withNamespace ? $this->namespace . '\\' . $this->entityClass : $this->entityClass) . 'Facade';
+		return $this->getEntityClass($withNamespace) . 'Facade';
 	}
 
 	public function getNotFoundExceptionClass(bool $withNamespace = false): string
