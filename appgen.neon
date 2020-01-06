@@ -6,6 +6,6 @@ model:
 		createSetters: false
 		defaultTraits:
 			removable: null
-			timestampable: null
+			timestampable: \Test\Test
 
 	symfonyEvents: true

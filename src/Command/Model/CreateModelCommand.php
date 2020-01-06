@@ -234,9 +234,6 @@ class CreateModelCommand extends Command
 			file_put_contents($location, $content);
 		}
 
-		$output->writeln('<yellow>Entity</yellow>, <yellow>DTO</yellow>, <yellow>Factory</yellow>, <yellow>Repository</yellow>, <yellow>Facade</yellow> and <yellow>Events</yellow> were <info>successfully</info> created!');
-		$output->writeln('');
-
 		$output->writeln('Files created:');
 		foreach ($classMap as $file => $class) {
 			$output->writeln(sprintf('<info>%s</info>', $file));
