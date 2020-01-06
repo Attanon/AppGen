@@ -71,13 +71,13 @@ Default configuration will be created when `appgen` command is executed for the 
 ```yaml
 appDir: app
 model:
-	entity:
-		idType: uuid_binary
-		idComment: null
-		createSetters: false
-		defaultTraits:
-			timestampable: \Your\TimestampableTrait
+    entity:
+        idType: uuid_binary
+        idComment: null
+        createSetters: false
+        defaultTraits:
+            timestampable: \Your\TimestampableTrait
             removable: \Your\RemovableTrait
 
-	symfonyEvents: true
+    symfonyEvents: true
 ```
