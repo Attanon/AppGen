@@ -22,7 +22,7 @@ use Symfony\Component\Console\Application;
 define('APPGEN_VERSION', '0.1');
 
 if (!file_exists($configFile = 'appgen.neon')) {
-	file_put_contents($configFile, Neon::encode(new AppGenConfig(), Neon::BLOCK));
+	file_put_contents($configFile, str_replace(['    ', "\n\n"], ["\t", "\n"], Neon::encode(new AppGenConfig(), Neon::BLOCK)));
 }
 
 $processor = new Processor();
