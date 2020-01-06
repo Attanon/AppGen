@@ -17,7 +17,7 @@ use Nette\Schema\Processor;
 use Symfony\Component\Console\Application;
 
 if (!file_exists($configFile = 'appgen.neon')) {
-	file_put_contents($configFile, Neon::encode(new AppGenConfig(), Neon::BLOCK));
+	file_put_contents($configFile, Neon::encode(new AppGenConfig(), [Neon::BLOCK, Neon::BLOCK]));
 }
 
 $processor = new Processor();

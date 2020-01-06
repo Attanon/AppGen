@@ -63,3 +63,21 @@ vendor/bin/appgen
  example/Article/Event/ArticleUpdatedEvent.php
  example/Article/Event/ArticleDeletedEvent.php
 ```
+
+# Example configuration
+
+Default configuration will be created when `appgen` command is executed for the first time
+
+```yaml
+appDir: app
+model:
+	entity:
+		idType: uuid_binary
+		idComment: null
+		createSetters: false
+		defaultTraits:
+			timestampable: \Your\TimestampableTrait
+            removable: \Your\RemovableTrait
+
+	symfonyEvents: true
+```
