@@ -44,6 +44,16 @@ class Article
 		$this->content = $data->content;
 	}
 
+	public function getData(): ArticleData
+	{
+		$data = new ArticleData();
+		$data->slug = $this->slug;
+		$data->title = $this->title;
+		$data->content = $this->content;
+
+		return $data;
+	}
+
 	public function getId(): UuidInterface
 	{
 		return $this->id;

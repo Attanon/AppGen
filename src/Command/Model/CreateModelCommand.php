@@ -118,7 +118,7 @@ class CreateModelCommand extends Command
 
 		$output->writeln('');
 		$createDataFactory = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>DataFactory</yellow> Class for Form Handling</blue>? [<info>yes</info>] ', true));
-		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> Method</blue>? [<info>yes</info>] ', true));
+		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> and <yellow>getData</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> Method</blue>? [<info>yes</info>] ', true));
 		$output->writeln('');

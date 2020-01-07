@@ -90,11 +90,20 @@ class EntityGenerator
 			$edit->addParameter('data')
 				->setType($input->getDataClass(true));
 
+			$getData = $class->addMethod('getData')
+				->setReturnType($input->getDataClass(true));
+
+			$getData->addBody(sprintf('$data = new %s();', $input->getDataClass()));
+
 			foreach ($input->getEntityProperties() as $property) {
 				if ($property->getName() !== 'updatedAt' && $property->getName() !== 'createdAt') {
 					$edit->addBody(sprintf('$this->%1$s = $data->%1$s;', $property->getName()));
+					$getData->addBody(sprintf('$data->%1$s = $this->%1$s;', $property->getName()));
 				}
 			}
+
+			$getData->addBody('');
+			$getData->addBody('return $data;');
 		}
 
 		$class->addMethod('getId')
