@@ -75,15 +75,18 @@ class EntityGenerator
 
 		$constructor = $class->addMethod('__construct');
 
-		$constructor->addParameter('id')
-			->setType('Ramsey\Uuid\UuidInterface');
+		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
+			$constructor->addParameter('id')
+				->setType('Ramsey\Uuid\UuidInterface');
+			$constructor->addBody('$this->id = $id;');
+		}
 
 		$constructor->addParameter('data')
 			->setType($input->getDataClass(true));
 
-		$constructor->addBody('$this->id = $id;');
-
 		if ($input->createEditMethod()) {
+			$constructor->addBody('$this->edit($data);');
+
 			$edit = $class->addMethod('edit')
 				->setReturnType(Type::VOID);
 
@@ -107,7 +110,7 @@ class EntityGenerator
 		}
 
 		$class->addMethod('getId')
-			->setReturnType($this->config->model->entity->idType === 'uuid' || $this->config->model->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
+			->setReturnType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
 			->setBody('return $this->id;');
 
 		foreach ($input->getEntityProperties() as $property) {

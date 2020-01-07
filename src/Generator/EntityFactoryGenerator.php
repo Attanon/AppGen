@@ -37,7 +37,12 @@ class EntityFactoryGenerator
 			->setReturnType($input->getEntityClass(true));
 		$create->addParameter('data')
 			->setType($input->getDataClass(true));
-		$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $input->getEntityClass()));
+
+		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
+			$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $input->getEntityClass()));
+		} else {
+			$create->addBody(sprintf('return new %s($data);', $input->getEntityClass()));
+		}
 
 		$namespace->add($class);
 
