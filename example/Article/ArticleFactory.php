@@ -8,7 +8,7 @@ use Ramsey\Uuid\UuidInterface;
 
 final class ArticleFactory
 {
-	public function create(ArticleFactory $data): Article
+	public function create(ArticleData $data): Article
 	{
 		return new Article(Uuid::uuid4(), $data);
 	}
