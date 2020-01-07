@@ -36,7 +36,7 @@ class EntityFactoryGenerator
 		$create = $class->addMethod('create')
 			->setReturnType($input->getEntityClass(true));
 		$create->addParameter('data')
-			->setType($input->getFactoryClass(true));
+			->setType($input->getDataClass(true));
 		$create->addBody(sprintf('return new %s(Uuid::uuid4(), $data);', $input->getEntityClass()));
 
 		$namespace->add($class);
