@@ -72,7 +72,6 @@ class CreateModelCommand extends BaseCommand
 
 		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
-		$propertyNames = [];
 
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
 			$lazyName = null;
@@ -88,8 +87,7 @@ class CreateModelCommand extends BaseCommand
 				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
 				$output->writeln('');
 
-				$properties[] = new DoctrineEntityProperty((string) $name, $type, $value);
-				$propertyNames[] = $name;
+				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $value);
 
 				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
 				if ($defineAnother === null || strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {
@@ -119,7 +117,7 @@ class CreateModelCommand extends BaseCommand
 			}
 
 			foreach ($getByMethods as $getByMethod) {
-				if (!in_array($getByMethod, $propertyNames)) {
+				if (!in_array($getByMethod, array_keys($properties))) {
 					$output->writeln('');
 					$output->writeln(sprintf('<error>Error! Property "%s" does not exist!</error>', $getByMethod));
 					$output->writeln('');
@@ -138,7 +136,7 @@ class CreateModelCommand extends BaseCommand
 			}
 
 			foreach ($getAllByMethods as $getAllByMethod) {
-				if (!in_array($getAllByMethod, $propertyNames)) {
+				if (!in_array($getAllByMethod, array_keys($properties))) {
 					$output->writeln('');
 					$output->writeln(sprintf('<error>Error! Property "%s" does not exist!</error>', $getAllByMethod));
 					$output->writeln('');
@@ -183,7 +181,7 @@ class CreateModelCommand extends BaseCommand
 		$input = new CreateModelResult(
 			$namespace,
 			$entityName,
-			$properties,
+			array_values($properties),
 			$createGetAllMethod,
 			$createEditMethod,
 			$createDeleteMethod,
