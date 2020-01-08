@@ -28,7 +28,6 @@ if (!file_exists($configFile = 'appgen.neon')) {
 	$application->add(new InitialCommand());
 	$application->setDefaultCommand(InitialCommand::getDefaultName());
 } else {
-
 	$processor = new Processor();
 
 	try {
