@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Command\Model;
 
+use Archette\AppGen\Command\BaseCommand;
 use Archette\AppGen\Generator\EntityDataFactoryGenerator;
 use Archette\AppGen\Generator\EntityDataGenerator;
 use Archette\AppGen\Generator\EntityEventGenerator;
@@ -14,7 +15,6 @@ use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class CreateModelCommand extends Command
+class CreateModelCommand extends BaseCommand
 {
 	private AppGenConfig $config;
 	private EntityGenerator $entityGenerator;
@@ -33,6 +33,8 @@ class CreateModelCommand extends Command
 	private EntityFacadeGenerator $entityFacadeGenerator;
 	private EntityNotFoundExceptionGenerator $entityNotFoundExceptionGenerator;
 	private EntityEventGenerator $entityEventGenerator;
+
+	protected static $defaultName = 'appgen:model';
 
 	public function __construct(
 		AppGenConfig $config,
@@ -57,26 +59,12 @@ class CreateModelCommand extends Command
 		$this->entityEventGenerator = $entityEventGenerator;
 	}
 
-	protected function configure(): void
-	{
-		$this->setName('appgen:model')
-			->setDescription('Create model package with entity');
-	}
-
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
+		parent::execute($input, $output);
+
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
-
-		$output->getFormatter()->setStyle('blue', new OutputFormatterStyle('blue'));
-		$output->getFormatter()->setStyle('yellow', new OutputFormatterStyle('yellow'));
-		$output->getFormatter()->setStyle('success', new OutputFormatterStyle('white'));
-
-		$output->writeln('');
-		$output->writeln('<info>#################################################</info>');
-		$output->writeln(sprintf('<info>~</info> Welcome to <blue>AppGen v%s</blue> created by <blue>Rick Strafy</blue> <info>~</info>', APPGEN_VERSION));
-		$output->writeln('<info>#################################################</info>');
-		$output->writeln('');
 
 		$entityName = $questionHelper->ask($input, $output, new Question('# <blue>Entity Name</blue>: '));
 		$namespace = trim($questionHelper->ask($input, $output, new Question('# <blue>Namespace</blue>: ')), '\\');
@@ -246,8 +234,6 @@ class CreateModelCommand extends Command
 		foreach ($classMap as $file => $class) {
 			$output->writeln(sprintf('<info>%s</info>', $file));
 		}
-
-		$output->writeln('');
 
 		return 1;
 	}
