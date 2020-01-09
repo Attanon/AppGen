@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Article;
 
-use Ramsey\Uuid\UuidInterface;
+use Ramsey\Uuid\Uuid;
 
 final class ArticleFactory
 {

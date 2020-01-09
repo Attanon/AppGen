@@ -28,7 +28,7 @@ class EntityFactoryGenerator
 
 		$namespace = $file->addNamespace($input->getNamespace());
 		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
-			$namespace->addUse('Ramsey\Uuid\UuidInterface');
+			$namespace->addUse('Ramsey\Uuid\Uuid');
 		}
 
 		$class = new ClassType($input->getFactoryClass());
