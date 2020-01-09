@@ -7,6 +7,9 @@ namespace Test\Article;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Test\Article\Event\ArticleCreatedEvent;
+use Test\Article\Event\ArticleDeletedEvent;
+use Test\Article\Event\ArticleUpdatedEvent;
 
 final class ArticleFacade extends ArticleRepository
 {
