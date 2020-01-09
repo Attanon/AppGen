@@ -36,6 +36,15 @@ class EntityFacadeGenerator
 		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
 		}
+		if ($createdEvent = $input->getEventClass('created', true)) {
+			$namespace->addUse($createdEvent);
+		}
+		if ($updatedEvent = $input->getEventClass('updated')) {
+			$namespace->addUse($updatedEvent);
+		}
+		if ($deletedEvent = $input->getEventClass('deleted')) {
+			$namespace->addUse($deletedEvent);
+		}
 
 		$class = new ClassType($input->getFacadeClass());
 		$class->setFinal();
