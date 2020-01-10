@@ -36,7 +36,6 @@ class EntityGenerator
 		}
 
 		$class = new ClassType($input->getEntityClass());
-		$class->setFinal();
 
 		$class->addComment('@ORM\Entity')
 			->addComment('@ORM\HasLifecycleCallbacks')
