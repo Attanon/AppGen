@@ -9,7 +9,7 @@ require 'vendor/autoload.php';
 $p = new Phar($fileName);
 
 $p->startBuffering();
-$p->buildFromDirectory(__DIR__, '/^(?=.*.php)(?!.*example)(?!.*.idea)(?!.*.md)(?!.*.git).*$/');
+$p->buildFromDirectory(__DIR__, '/(?=.*.php$)(^(?!.*example).*)$/');
 $p->setStub("#!/usr/bin/env php \n" . $p->createDefaultStub('kernel.php'));
 $p->stopBuffering();
 
