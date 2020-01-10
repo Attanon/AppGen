@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Test\Article\Event\ArticleCreatedEvent;
 use Test\Article\Event\ArticleDeletedEvent;
 use Test\Article\Event\ArticleUpdatedEvent;
+use Test\Article\Exception\ArticleNotFoundException;
 
 final class ArticleFacade extends ArticleRepository
 {
@@ -37,6 +38,9 @@ final class ArticleFacade extends ArticleRepository
 		return $article;
 	}
 
+	/**
+	 * @throws ArticleNotFoundException
+	 */
 	public function edit(UuidInterface $id, ArticleData $data): Article
 	{
 		$article = $this->get($id);
@@ -49,6 +53,9 @@ final class ArticleFacade extends ArticleRepository
 		return $article;
 	}
 
+	/**
+	 * @throws ArticleNotFoundException
+	 */
 	public function delete(UuidInterface $id): void
 	{
 		$article = $this->get($id);

@@ -45,6 +45,9 @@ class EntityFacadeGenerator
 		if ($deletedEvent = $input->getEventClass('deleted')) {
 			$namespace->addUse($deletedEvent);
 		}
+		if ($input->createEditMethod() || $input->createDeleteMethod()) {
+			$namespace->addUse($input->getNotFoundExceptionClass(true));
+		}
 
 		$class = new ClassType($input->getFacadeClass());
 		$class->setFinal();
@@ -105,6 +108,8 @@ class EntityFacadeGenerator
 				->setReturnType($input->getEntityClass(true))
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
+			$edit->addComment(sprintf('@throws %s', $input->getNotFoundExceptionClass()));
+
 			$edit->addParameter('id')
 				->setType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : 'int');
 
@@ -127,6 +132,8 @@ class EntityFacadeGenerator
 			$delete = $class->addMethod('delete')
 				->setReturnType(Type::VOID)
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
+
+			$delete->addComment(sprintf('@throws %s', $input->getNotFoundExceptionClass()));
 
 			$delete->addParameter('id')
 				->setType(Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT);
