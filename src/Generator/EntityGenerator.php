@@ -35,11 +35,12 @@ class EntityGenerator
 			$namespace->addUse($class);
 		}
 
+		$tableName = str_replace('-', '_', Strings::webalize($input->getEntityClass()));
 		$class = new ClassType($input->getEntityClass());
 
 		$class->addComment('@ORM\Entity')
 			->addComment('@ORM\HasLifecycleCallbacks')
-			->addComment('@ORM\Table(name="' . str_replace('-', '_', Strings::webalize($input->getEntityClass())) . '")');
+			->addComment('@ORM\Table(name="' . $tableName . '")');
 
 		$id = $class->addProperty('id');
 		$id->setType($this->config->model->entity->idType === 'uuid' || $this->config->model->entity->idType === 'uuid_binary' ? 'Ramsey\Uuid\UuidInterface' : Type::INT)
@@ -53,15 +54,41 @@ class EntityGenerator
 
 		foreach ($input->getEntityProperties() as $property) {
 			$doctrineProperty = $class->addProperty($property->getName())
-				->setType($property->getType())
-				->setNullable($property->isNullable())
-				->setVisibility(ClassType::VISIBILITY_PRIVATE)
-				->addComment(sprintf('@ORM\Column(type="%s"%s%s%s)',
+				->setVisibility(ClassType::VISIBILITY_PRIVATE);
+
+			if ($relation = $property->getRelation()) {
+				if ($relation->getType() === $relation::RELATION_MANY_TO_ONE || $relation->getType() === $relation::RELATION_ONE_TO_ONE) {
+					$doctrineProperty->setType($property->getType())
+						->setNullable($property->isNullable());
+
+				} else {
+					$doctrineProperty->addComment(sprintf('@var %s[]', $relation->getTargetClassName()));
+					$namespace->addUse($relation->getTargetClass());
+				}
+
+				$doctrineProperty->addComment(sprintf('@ORM\%s(targetEntity="\%s"%s%s%s)',
+					$relation->getType(),
+					$relation->getTargetClass(),
+					$relation->isBiDirectional() && ($relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_ONE_TO_ONE) ? ', mappedBy="' . $tableName . '"' : '',
+					$relation->isBiDirectional() && ($relation->getType() === $relation::RELATION_MANY_TO_ONE || $relation->getType() === $relation::RELATION_MANY_TO_MANY) ? ', inversedBy="' . $tableName . '"' : '',
+					$relation->getCascadeString() !== null ? ', cascade={' . $relation->getCascadeString() .'}' : ''
+				));
+
+				if ($relation->isOnDeleteCascade()) {
+					$doctrineProperty->addComment('@ORM\JoinColumn(onDelete="CASCADE")');
+				}
+
+			} else {
+				$doctrineProperty->setType($property->getType())
+					->setNullable($property->isNullable());
+
+				$doctrineProperty->addComment(sprintf('@ORM\Column(type="%s"%s%s%s)',
 					$property->getDoctrineType(),
 					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
 					$property->isNullable() ? ', nullable=false' : '',
 					$property->isUnique() ? ', unique=true' : ''
 				));
+			}
 
 			if ($property->getDefaultValue() !== null || $property->isNullable()) {
 				$doctrineProperty->setValue($property->getDefaultValue());
@@ -78,6 +105,22 @@ class EntityGenerator
 			$constructor->addParameter('id')
 				->setType('Ramsey\Uuid\UuidInterface');
 			$constructor->addBody('$this->id = $id;');
+		}
+
+		foreach ($input->getEntityProperties() as $property) {
+			if ($relation = $property->getRelation()) {
+				$namespace->addUse($relation->getTargetClass());
+
+				if ($relation->getType() === $relation::RELATION_MANY_TO_ONE || $relation->getType() === $relation::RELATION_ONE_TO_ONE) {
+					continue;
+				}
+
+				$constructor->addBody(sprintf('$this->%s = new ArrayCollection();', $property->getName()));
+
+				if (!in_array($arrayCollection = 'Doctrine\Common\Collections\ArrayCollection', $namespace->getUses())) {
+					$namespace->addUse($arrayCollection);
+				}
+			}
 		}
 
 		$constructor->addParameter('data')
@@ -113,6 +156,14 @@ class EntityGenerator
 			->setBody('return $this->id;');
 
 		foreach ($input->getEntityProperties() as $property) {
+			if ($relation = $property->getRelation()) {
+				if ($relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_MANY_TO_MANY) {
+					$class->addMethod('get' . Strings::firstUpper($property->getName()))
+						->setBody(sprintf('return $this->%s;', $property->getName()))
+						->addComment(sprintf('@return %s[]', $relation->getTargetClassName()));
+					continue;
+				}
+			}
 			$class->addMethod(($property->isBoolean() ? 'is' : 'get') . Strings::firstUpper($property->getName()))
 				->setReturnType($property->getType())
 				->setReturnNullable($property->isNullable())

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Archette\AppGen\Generator\Property;
 
+use Archette\AppGen\Generator\Property\Relation\RelationData;
 use Nette\Utils\Strings;
 
 class DoctrineEntityProperty implements Property
 {
-	public const RELATION_MANY_TO_MANY = 'ManyToMany';
-	public const RELATION_ONE_TO_MANY = 'OneToMany';
-	public const RELATION_MANY_TO_ONE = 'ManyToOne';
-
 	private string $name;
 	private string $type;
 	private string $doctrineType;
@@ -19,7 +16,7 @@ class DoctrineEntityProperty implements Property
 	private ?string $defaultValue;
 	private ?bool $nullable;
 	private ?bool $unique;
-	private ?string $relationType = null;
+	private ?RelationData $relationData;
 
 	public function __construct(
 		string $name,
@@ -27,7 +24,7 @@ class DoctrineEntityProperty implements Property
 		string $type,
 		string $doctrineType,
 		string $defaultValue = null,
-		string $relationType = null
+		RelationData $relationData = null
 	) {
 		$this->name = $name;
 		$this->nullable = $this->isTypeNullable($typeString);
@@ -54,7 +51,7 @@ class DoctrineEntityProperty implements Property
 		}
 
 		$this->defaultValue = $defaultValue;
-		$this->relationType = $relationType;
+		$this->relationData = $relationData;
 	}
 
 	private function isTypeNullable(string $type): bool
@@ -138,13 +135,8 @@ class DoctrineEntityProperty implements Property
 		return $this->unique;
 	}
 
-	public function getRelationType(): string
+	public function getRelation(): ?RelationData
 	{
-		return $this->relationType;
-	}
-
-	public function isRelation(): bool
-	{
-		return $this->relationType !== null;
+		return $this->relationData;
 	}
 }

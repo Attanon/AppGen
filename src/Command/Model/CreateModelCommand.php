@@ -15,6 +15,7 @@ use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
+use Archette\AppGen\Generator\Property\Relation\RelationData;
 use Archette\AppGen\Helper\ClassHelper;
 use Archette\AppGen\Helper\Exception\TypeNotFoundException;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -81,6 +82,8 @@ class CreateModelCommand extends BaseCommand
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
 			$lazyName = null;
 			while (true) {
+				$relationData = null;
+
 				$output->writeln('');
 				if ($lazyName !== null) {
 					$name = $lazyName;
@@ -97,30 +100,43 @@ class CreateModelCommand extends BaseCommand
 						$doctrineType = $this->classHelper->formatDoctrineType($type);
 
 					} catch (TypeNotFoundException $e) {
-						$phpType = $doctrineType = $this->classHelper->resolveNamespace($type);
+						$phpType = $doctrineType = $this->classHelper->resolveNamespace($type) . '\\' . $type;
 
 						if ($phpType !== null) {
 							while (true) {
-								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <yellow>Relation</yellow> (<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</blue>) [<info>M:1</info>]: ', 'M:1')));
+								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <yellow>Relation Type</yellow> (<blue>1:1</blue>/<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</blue>) [<info>M:1</info>]: ', 'M:1')));
 
-								if ($relation === '1:m') {
-									$relation = DoctrineEntityProperty::RELATION_ONE_TO_MANY;
+								if ($relation === '1:1') {
+									$relation = RelationData::RELATION_ONE_TO_ONE;
+								} elseif ($relation === '1:m') {
+									$relation = RelationData::RELATION_ONE_TO_MANY;
 								} elseif ($relation === 'n:m') {
-									$relation = DoctrineEntityProperty::RELATION_MANY_TO_MANY;
+									$relation = RelationData::RELATION_MANY_TO_MANY;
 								} elseif ($relation === 'm:1') {
-									$relation = DoctrineEntityProperty::RELATION_MANY_TO_ONE;
+									$relation = RelationData::RELATION_MANY_TO_ONE;
 								} else {
 									$output->writeln('');
-									$output->writeln(sprintf('<error>Error! Invalid relation!</error>'));
+									$output->writeln(sprintf('<error>Error! Invalid Relation!</error>'));
 									$output->writeln('');
 									continue;
 								}
 
 								break;
 							}
+
+							$bidirectional = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Bidirectional</yellow> (add mappedBy/inverdedBy)? [<info>no</info>] ', false));
+							$cascadeAttributes = $questionHelper->ask($input, $output, new Question('# <yellow>Define Cascade Attributes</yellow> (<blue>persist</blue>/<blue>remove</blue>/<blue>all</blue>): ', null));
+
+							$onDeleteCascade = false;
+							if ($relation === RelationData::RELATION_ONE_TO_ONE || $relation === RelationData::RELATION_MANY_TO_ONE) {
+								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Add Cascade Delete on Database Level?</yellow>? [<info>no</info>] ', false));
+							}
+
+							$relationData = new RelationData($relation, $phpType, trim($type, '?'), $bidirectional, $cascadeAttributes, $onDeleteCascade);
+
 						} else {
 							$output->writeln('');
-							$output->writeln(sprintf('<error>Error! Invalid type!</error>'));
+							$output->writeln(sprintf('<error>Error! Invalid Type!</error>'));
 							$output->writeln('');
 							continue;
 						}
@@ -129,10 +145,14 @@ class CreateModelCommand extends BaseCommand
 					break;
 				}
 
-				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
+				if ($relationData === null) {
+					$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
+				} else {
+					$value = null;
+				}
 				$output->writeln('');
 
-				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $phpType, $doctrineType, $value, $relation);
+				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $phpType, $doctrineType, $value, $relationData);
 
 				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
 				if ($defineAnother === null || strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {

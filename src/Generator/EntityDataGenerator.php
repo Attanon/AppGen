@@ -32,12 +32,23 @@ class EntityDataGenerator
 
 		foreach ($input->getEntityProperties() as $property) {
 			$dataProperty = $class->addProperty($property->getName())
-				->setType($property->getType())
-				->setNullable($property->isNullable())
 				->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
-			if ($property->getDefaultValue() !== null || $property->isNullable()) {
-				$dataProperty->setValue($property->getDefaultValue());
+			$relation = $property->getRelation();
+			if ($relation !== null) {
+				$namespace->addUse($relation->getTargetClass());
+			}
+
+			if ($relation !== null && $relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_MANY_TO_MANY) {
+				$dataProperty->setValue([])
+					->addComment(sprintf('@var %s[]', $relation->getTargetClassName()));
+			} else {
+				$dataProperty->setType($property->getType())
+					->setNullable($property->isNullable());
+
+				if ($property->getDefaultValue() !== null || $property->isNullable()) {
+					$dataProperty->setValue($property->getDefaultValue());
+				}
 			}
 		}
 
