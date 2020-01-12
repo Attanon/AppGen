@@ -132,7 +132,7 @@ class CreateModelCommand extends BaseCommand
 
 							$onDeleteCascade = false;
 							if ($relation === RelationData::RELATION_ONE_TO_ONE || $relation === RelationData::RELATION_MANY_TO_ONE) {
-								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Add Cascade Delete on Database Level?</yellow>? [<info>no</info>] ', false));
+								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Add Cascade Delete on Database Level</yellow>? [<info>no</info>] ', false));
 							}
 
 							$relationData = new RelationData($relation, $phpType, trim($type, '?'), $bidirectional, $cascadeAttributes, $onDeleteCascade);
