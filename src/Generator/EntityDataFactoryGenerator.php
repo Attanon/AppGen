@@ -35,6 +35,7 @@ class EntityDataFactoryGenerator
 		foreach ($input->getEntityProperties() as $p) {
 			if ($p->getRelation() !== null) {
 				$constructor = $class->addMethod('__construct');
+				$namespace->addUse('Ramsey\Uuid\Uuid');
 				foreach ($input->getEntityProperties() as $property) {
 					$relation = $property->getRelation();
 					if ($relation !== null) {
