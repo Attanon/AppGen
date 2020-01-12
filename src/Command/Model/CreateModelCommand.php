@@ -124,7 +124,7 @@ class CreateModelCommand extends BaseCommand
 								break;
 							}
 
-							$bidirectional = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Bidirectional</yellow> (add mappedBy/inverdedBy)? [<info>no</info>] ', false));
+							$bidirectional = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Bidirectional</yellow> (add mappedBy/inversedBy)? [<info>no</info>] ', false));
 							$cascadeAttributes = $questionHelper->ask($input, $output, new Question('# <yellow>Define Cascade Attributes</yellow> (<blue>persist</blue>/<blue>remove</blue>/<blue>all</blue>): ', 'no'));
 							if (!in_array($cascadeAttributes, ['persist', 'remove', 'all'])) {
 								$cascadeAttributes = null;
