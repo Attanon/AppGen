@@ -15,6 +15,7 @@ use Archette\AppGen\Generator\EntityGenerator;
 use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
+use Archette\AppGen\Helper\ClassHelper;
 use Nette\Neon\Neon;
 use Nette\Schema\Expect;
 use Nette\Schema\Processor;
@@ -38,6 +39,7 @@ if (!file_exists($configFile = 'appgen.neon')) {
 
 	$application->add(new CreateModelCommand(
 		$config,
+		new ClassHelper($config),
 		new EntityGenerator($config),
 		new EntityDataGenerator($config),
 		new EntityDataFactoryGenerator($config),

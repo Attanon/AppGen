@@ -15,7 +15,8 @@ use Archette\AppGen\Generator\EntityNotFoundExceptionGenerator;
 use Archette\AppGen\Generator\EntityRepositoryGenerator;
 use Archette\AppGen\Config\AppGenConfig;
 use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Archette\AppGen\Helper\ClassHelper;
+use Archette\AppGen\Helper\Exception\TypeNotFoundException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Question\Question;
 class CreateModelCommand extends BaseCommand
 {
 	private AppGenConfig $config;
+	private ClassHelper $classHelper;
 	private EntityGenerator $entityGenerator;
 	private EntityDataGenerator $entityDataGenerator;
 	private EntityDataFactoryGenerator $entityDataFactoryGenerator;
@@ -38,6 +40,7 @@ class CreateModelCommand extends BaseCommand
 
 	public function __construct(
 		AppGenConfig $config,
+		ClassHelper $classHelper,
 		EntityGenerator $entityGenerator,
 		EntityDataGenerator $entityDataGenerator,
 		EntityDataFactoryGenerator $entityDataFactoryGenerator,
@@ -49,6 +52,7 @@ class CreateModelCommand extends BaseCommand
 	) {
 		parent::__construct();
 		$this->config = $config;
+		$this->classHelper = $classHelper;
 		$this->entityGenerator = $entityGenerator;
 		$this->entityDataGenerator = $entityDataGenerator;
 		$this->entityDataFactoryGenerator = $entityDataFactoryGenerator;
@@ -73,6 +77,7 @@ class CreateModelCommand extends BaseCommand
 		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
 
+		$type = $phpType = $doctrineType = $relation = '';
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
 			$lazyName = null;
 			while (true) {
@@ -83,11 +88,51 @@ class CreateModelCommand extends BaseCommand
 				} else {
 					$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
 				}
-				$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
+
+				while (true) {
+					$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
+
+					try {
+						$phpType = $this->classHelper->formatPhpType($type);
+						$doctrineType = $this->classHelper->formatDoctrineType($type);
+
+					} catch (TypeNotFoundException $e) {
+						$phpType = $doctrineType = $this->classHelper->resolveNamespace($type);
+
+						if ($phpType !== null) {
+							while (true) {
+								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <yellow>Relation</yellow> (<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</blue>) [<info>M:1</info>]: ', 'M:1')));
+
+								if ($relation === '1:m') {
+									$relation = DoctrineEntityProperty::RELATION_ONE_TO_MANY;
+								} elseif ($relation === 'n:m') {
+									$relation = DoctrineEntityProperty::RELATION_MANY_TO_MANY;
+								} elseif ($relation === 'm:1') {
+									$relation = DoctrineEntityProperty::RELATION_MANY_TO_ONE;
+								} else {
+									$output->writeln('');
+									$output->writeln(sprintf('<error>Error! Invalid relation!</error>'));
+									$output->writeln('');
+									continue;
+								}
+
+								break;
+							}
+						} else {
+							$output->writeln('');
+							$output->writeln(sprintf('<error>Error! Invalid type!</error>'));
+							$output->writeln('');
+							continue;
+						}
+					}
+
+					break;
+				}
+
 				$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
 				$output->writeln('');
 
-				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $value);
+				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $phpType, $doctrineType, $value, $relation);
 
 				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
 				if ($defineAnother === null || strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {

@@ -8,6 +8,10 @@ use Nette\Utils\Strings;
 
 class DoctrineEntityProperty implements Property
 {
+	public const RELATION_MANY_TO_MANY = 'ManyToMany';
+	public const RELATION_ONE_TO_MANY = 'OneToMany';
+	public const RELATION_MANY_TO_ONE = 'ManyToOne';
+
 	private string $name;
 	private string $type;
 	private string $doctrineType;
@@ -15,21 +19,23 @@ class DoctrineEntityProperty implements Property
 	private ?string $defaultValue;
 	private ?bool $nullable;
 	private ?bool $unique;
+	private ?string $relationType = null;
 
 	public function __construct(
 		string $name,
+		string $typeString,
 		string $type,
-		string $defaultValue = null
+		string $doctrineType,
+		string $defaultValue = null,
+		string $relationType = null
 	) {
 		$this->name = $name;
-		$this->nullable = $this->isTypeNullable($type);
-		$this->unique = $this->isTypeUnique($type);
-		$this->doctrineMaxLength = $this->getMaxLength($type);
+		$this->nullable = $this->isTypeNullable($typeString);
+		$this->unique = $this->isTypeUnique($typeString);
+		$this->doctrineMaxLength = $this->getMaxLength($typeString);
 
-		$type = explode(':', explode('|', trim(explode(' ', $type)[0], '?'))[0])[0];
-
-		$this->type = $this->formatType($type);
-		$this->doctrineType = $this->formatDoctrineType($type);
+		$this->type = $type;
+		$this->doctrineType = $doctrineType;
 
 		if ($defaultValue === '""' || $defaultValue === "''") {
 			$defaultValue = '';
@@ -48,6 +54,7 @@ class DoctrineEntityProperty implements Property
 		}
 
 		$this->defaultValue = $defaultValue;
+		$this->relationType = $relationType;
 	}
 
 	private function isTypeNullable(string $type): bool
@@ -71,44 +78,6 @@ class DoctrineEntityProperty implements Property
 		}
 
 		return null;
-	}
-
-	private function formatDoctrineType(string $type): string
-	{
-		$type = trim(strtolower($type), '?');
-
-		if (Strings::contains($type, 'bool')) {
-			return 'boolean';
-		}
-
-		if (Strings::contains($type, 'int') ) {
-			return 'integer';
-		}
-
-		return $type;
-	}
-
-	private function formatType(string $type): string
-	{
-		$type = trim(strtolower($type), '?');
-
-		if (Strings::contains($type, 'text')) {
-			return 'string';
-		}
-
-		if (Strings::contains($type, 'boolean')) {
-			return 'bool';
-		}
-
-		if (Strings::contains($type, 'date')) {
-			return '\DateTime';
-		}
-
-		if (Strings::contains($type, 'integer')) {
-			return 'int';
-		}
-
-		return $type;
 	}
 
 	public function getName(): string
@@ -167,5 +136,15 @@ class DoctrineEntityProperty implements Property
 	public function isUnique(): bool
 	{
 		return $this->unique;
+	}
+
+	public function getRelationType(): string
+	{
+		return $this->relationType;
+	}
+
+	public function isRelation(): bool
+	{
+		return $this->relationType !== null;
 	}
 }
