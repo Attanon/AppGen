@@ -38,13 +38,15 @@ class EntityDataFactoryGenerator
 				foreach ($input->getEntityProperties() as $property) {
 					$relation = $property->getRelation();
 					if ($relation !== null) {
-						$namespace->addUse($relation->getTargetClass() . 'Facade');
-						$class->addProperty(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
-							->setType($relation->getTargetClass() . 'Facade')
-							->setVisibility(ClassType::VISIBILITY_PRIVATE);
-						$constructor->addParameter(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
-							->setType($relation->getTargetClass() . 'Facade');
-						$constructor->addBody(sprintf('$this->%1$sFacade = $%1$sFacade;', Strings::firstLower($relation->getTargetClassName())));
+						if (!in_array($relation->getTargetClass() . 'Facade', $namespace->getUses())) {
+							$namespace->addUse($relation->getTargetClass() . 'Facade');
+							$class->addProperty(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
+								->setType($relation->getTargetClass() . 'Facade')
+								->setVisibility(ClassType::VISIBILITY_PRIVATE);
+							$constructor->addParameter(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
+								->setType($relation->getTargetClass() . 'Facade');
+							$constructor->addBody(sprintf('$this->%1$sFacade = $%1$sFacade;', Strings::firstLower($relation->getTargetClassName())));
+						}
 					}
 				}
 				break;
@@ -77,8 +79,8 @@ class EntityDataFactoryGenerator
 			if ($relation !== null) {
 				if ($relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_MANY_TO_MANY) {
 					$create->addBody('');
-					$create->addBody(sprintf('foreach ($formData[\'%1$s\'] as $%1$s)) {', $property->getName()));
-					$create->addBody(sprintf('$data->%1$s[] = $this->%2$sFacade->get(Uuid::fromString($formData[\'%1$s\']));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					$create->addBody(sprintf('foreach ($formData[\'%1$s\'] as $string) {', $property->getName()));
+					$create->addBody(sprintf('	$data->%1$s[] = $this->%2$sFacade->get(Uuid::fromString($string));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
 					$create->addBody('}');
 				}
 			}
